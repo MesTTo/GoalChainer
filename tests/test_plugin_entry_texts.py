@@ -181,10 +181,12 @@ def _texts_read(plugin: Path, monkeypatch: pytest.MonkeyPatch) -> set[str]:
         texts.add(text)
         raise _Read
 
-    # am[verifies a-entry-plugin-texts-1017@5bb214]
+    # gcskill hands the child its request as UTF-8 bytes on standard input, and input_text reads
+    # sys.stdin.buffer, so the stand-in's standard input is a text stream over those bytes.
+    # am[verifies a-entry-plugin-texts-1017@5bb214] am[verifies a-gc-entry-texts-stdin-1104@d9588a]
     def in_process(command: list[str], *, input: str, **_: Any) -> SimpleNamespace:
         stdout = io.StringIO()
-        monkeypatch.setattr(sys, "stdin", io.StringIO(input))
+        monkeypatch.setattr(sys, "stdin", io.TextIOWrapper(io.BytesIO(input.encode("utf-8")), encoding="utf-8"))
         with contextlib.redirect_stdout(stdout):
             code = omegaclaw_skill.main(command[command.index("goal_chainer.omegaclaw_skill") + 1 :])
         return SimpleNamespace(returncode=code, stdout=stdout.getvalue(), stderr="")
