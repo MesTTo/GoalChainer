@@ -27,6 +27,7 @@ def _choices(main, capsys) -> set[str]:
 # am[verifies a-integrate-domain-surface-1018@759698]
 # am[verifies a-dd-show-1018@f9e4e9]
 # am[verifies a-dg-cli-1019@996a1b]
+# am[verifies a-v2-cli-skill-surface-1020@6f755c] am[verifies a-gc-step-request-1104]
 def test_goalchainer_accepts_exactly_its_commands(capsys):
     assert _choices(cli.main, capsys) == {
         "request",
@@ -35,17 +36,22 @@ def test_goalchainer_accepts_exactly_its_commands(capsys):
         "snars",
         "relevance",
         "diagnose",
+        "motivation",
+        "step",
     }
 
 
 # am[verifies a-tk-entrypoints-1018@5d9a27]
 # am[verifies a-integrate-domain-surface-1018@759698]
+# am[verifies a-v2-cli-skill-surface-1020@6f755c] am[verifies a-gc-step-request-1104]
 def test_goalchainer_skill_accepts_exactly_its_skills(capsys):
     assert _choices(omegaclaw_skill.main, capsys) == {
         "goalchainer-system-prompt",
         "goalchainer-request",
         "goalchainer-directive-dispatch",
         "goalchainer-snars-dispatch",
+        "goalchainer-motivation-dispatch",
+        "goalchainer-step-request",
     }
 
 

@@ -32,7 +32,8 @@ from goal_chainer.runtime.engine import metta_engine
 OMEGACLAW = Path(__file__).resolve().parents[1] / "integrations" / "omegaclaw"
 LIB = OMEGACLAW / "_omega_lib.sh"
 # The plugin's skills in the order its loader adds them.
-PLUGIN_SKILLS = ["goalchainer-request", "goalchainer-directive-dispatch", "goalchainer-snars-dispatch"]
+PLUGIN_SKILLS = ["goalchainer-request", "goalchainer-directive-dispatch", "goalchainer-snars-dispatch",
+                 "goalchainer-motivation-dispatch", "goalchainer-step-request"]
 # The plugin README's incident review, without reading text, so no Jev answer is needed.
 REVIEW = {
     "operation": "review",
@@ -114,10 +115,10 @@ def _strict(schema: dict, root: bool = True) -> None:
         _strict(branch, root=False)
 
 
-# Omega's own getSkills, with the plugin loaded by its entry point, names the plugin's three skills;
+# Omega's own getSkills, with the plugin loaded by its entry point, names the plugin's five skills;
 # the plugin's prompt extension is the skill process's system prompt, and the skill rules are
 # Omega's getSkillRules.
-# am[verifies a-op-session-self-1018@bd8329] am[verifies a-rt-oh-derived-menu-1018@d6bf3d]
+# am[verifies a-op-session-self-1018@bd8329] am[verifies a-rt-oh-derived-menu-1018@d6bf3d] am[verifies a-gc-step-request-1104]
 def test_the_plugins_skills_prompt_extension_and_omegas_rules(core):
     registered = _host("omega_registered", core=core)
     extensions = _host("omega_extensions", core=core)

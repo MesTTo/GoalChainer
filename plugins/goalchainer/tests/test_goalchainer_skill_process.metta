@@ -20,6 +20,9 @@
 ; am[verifies a-v2-cli-skill-surface-1020@6f755c]
 !(test (py-call (skill_probe.failure_code (goalchainer-python) "goalchainer-motivation-dispatch" "not json"))
        invalid_input)
+; am[verifies a-gc-step-request-1104]
+!(test (py-call (skill_probe.failure_code (goalchainer-python) "goalchainer-step-request" "not json"))
+       invalid_input)
 
 ; Host runtime variables must not affect the child's own interpreter configuration.
 ; am[verifies a-rt-skill-process-boundary-1016@a36729]

@@ -131,8 +131,8 @@ def test_comments_are_ignored_and_extra_reports_fail():
 
 
 # The shipped suites hold only two-argument test forms the rule counts, as many as their runs report
-# (13 and 3, with the plugin installed).
-# am[verifies a-integrate-mettaspeak-assertion-accounting-1019@905c82]
+# (16 and 5, with the plugin installed).
+# am[verifies a-integrate-mettaspeak-assertion-accounting-1019@905c82] am[verifies a-gc-step-request-1104]
 def test_the_shipped_suites_declare_two_argument_tests():
     counts = {}
     for suite in sorted(TESTS.glob("test_*.metta")):
@@ -142,4 +142,4 @@ def test_the_shipped_suites_declare_two_argument_tests():
                  for atom in accounting._walk(accounting.parse(form.text[1:].lstrip()))
                  if isinstance(atom, list) and atom and atom[0] == accounting.Symbol("test")]
         assert {len(form) - 1 for form in forms} == {2}
-    assert counts == {"test_goalchainer_plugin.metta": 13, "test_goalchainer_skill_process.metta": 3}
+    assert counts == {"test_goalchainer_plugin.metta": 16, "test_goalchainer_skill_process.metta": 5}

@@ -1,4 +1,4 @@
-; Purpose: register bounded domain, motivation, directive and SNARS requests with the Omega
+; Purpose: register bounded domain, motivation, directive, step and SNARS requests with the Omega
 ; agent, formerly OmegaClaw, through its plugin API, with the reader's paths as Omega configuration.
 ; The installer writes goalchainer_host.py with GoalChainer's interpreter. Each skill passes JSON
 ; through gcskill to that process. The domain request preserves the user's text in reading.text.
@@ -50,6 +50,9 @@
      (add-skill goalchainer-motivation-dispatch
         "Record attributed need observations or host attempts, or inspect a motivation stream, with explicit resource limits"
         (json_request))
+     (add-skill goalchainer-step-request
+        "Give a creative controller's step-request its advisory verdict under a norm set, with explicit resource limits"
+        (json_request))
      (add-prompt-extension goalchainer (goalchainer-system-prompt))
      ()))
 
@@ -68,6 +71,10 @@
 ; am[implements a-v2-cli-skill-surface-1020@6f755c]
 (= (goalchainer-motivation-dispatch $request)
    (py-call (gcskill.motivation_dispatch (goalchainer-python) $request)))
+
+; am[implements a-gc-step-request-1104]
+(= (goalchainer-step-request $request)
+   (py-call (gcskill.step_request (goalchainer-python) $request)))
 
 ; am[implements a-integrate-domain-surface-1018@759698]
 (= (goalchainer-system-prompt)

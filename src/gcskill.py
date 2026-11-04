@@ -199,3 +199,8 @@ def motivation_dispatch(python: str, request: str) -> str:
 # am[implements a-integrate-domain-surface-1018@759698]
 def dispatch(python: str, request: str) -> str:
     return json.dumps(call(python, "goalchainer-snars-dispatch", request), sort_keys=True)
+
+
+# am[implements a-gc-step-request-1104]
+def step_request(python: str, request: str) -> str:
+    return json.dumps(call(python, "goalchainer-step-request", request), sort_keys=True)

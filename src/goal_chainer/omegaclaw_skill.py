@@ -1,4 +1,4 @@
-"""Purpose: dispatch bounded domain, motivation, directive and SNARS requests in the GoalChainer skill process."""
+"""Purpose: dispatch bounded domain, motivation, directive, step and SNARS requests in the GoalChainer skill process."""
 
 from __future__ import annotations
 
@@ -29,6 +29,8 @@ SYSTEM_PROMPT = (
     "Admission rechecks a returned step against current evidence. "
     "Record need observations and host-reported attempts with goalchainer-motivation-dispatch; "
     "a review never records an attempt. "
+    "Ask goalchainer-step-request for a step-request's advisory verdict, with step_request the "
+    "(step-request ...) atom's text and norms a packaged name or path. "
     "These results do not authorize execution or confirm an effect. "
     "Keep the current review, applicable norms, host authorization and observed receipts separate."
 )
@@ -58,14 +60,23 @@ def motivation_dispatch_payload(payload: dict[str, Any], *, budget: RunBudget) -
     return {"skill": "goalchainer-motivation-dispatch", **run_motivation_request(payload, budget=budget)}
 
 
+# am[implements a-gc-step-request-1104]
+def step_request_payload(payload: dict[str, Any], *, budget: RunBudget) -> dict[str, Any]:
+    from .step_request import run_step_request
+
+    return {"skill": "goalchainer-step-request", **run_step_request(payload, budget=budget)}
+
+
 # The dispatch table also supplies the process's accepted names.
 # am[implements a-integrate-domain-surface-1018@759698]
 # am[implements a-v2-cli-skill-surface-1020@6f755c]
+# am[implements a-gc-step-request-1104]
 DISPATCH = {
     "goalchainer-request": request_payload,
     "goalchainer-directive-dispatch": directive_dispatch_payload,
     "goalchainer-snars-dispatch": snars_dispatch_payload,
     "goalchainer-motivation-dispatch": motivation_dispatch_payload,
+    "goalchainer-step-request": step_request_payload,
 }
 
 

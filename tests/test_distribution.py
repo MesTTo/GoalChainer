@@ -89,6 +89,11 @@ def test_wheel_only_domain_command(tmp_path):
     source_files += [path for path in MODULES if path not in source_files]
     source_files += [*sorted((package_root / "planning" / "library").glob("*.metta")),
                      *sorted((package_root / "domains" / "data").glob("*.metta"))]
+    # The packaged norm sets a step request selects by name, read through the package's resources.
+    # am[verifies a-gc-step-norms-packaged-1104]
+    norm_sets = sorted((package_root / "norms").glob("*.metta"))
+    assert norm_sets, "the packaged norm sets are absent"
+    source_files += norm_sets
     with ZipFile(wheel) as archive:
         # The wheel holds the goal_chainer package, the three top-level py-call modules and its
         # metadata; nothing installs under the environment's prefix as a data file.

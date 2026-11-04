@@ -16,12 +16,13 @@ LIMITS = {"inference_budget": 100, "timeout_seconds": 30}
 
 # am[verifies a-integrate-domain-surface-1018@759698]
 # am[verifies a-v2-cli-skill-surface-1020@6f755c]
+# am[verifies a-gc-step-request-1104]
 def test_system_prompt_names_domain_reading_and_separate_execution_authority():
     payload = skill.run_skill("goalchainer-system-prompt", "")
     assert payload == {"skill": "goalchainer-system-prompt", "prompt": skill.SYSTEM_PROMPT}
     for requirement in ("domain", "reading.text", "original words", "inference_budget",
                         "timeout_seconds", "do not authorize execution", "goalchainer-motivation-dispatch",
-                        "a review never records an attempt"):
+                        "a review never records an attempt", "goalchainer-step-request", "step_request"):
         assert requirement in payload["prompt"]
 
 

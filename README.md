@@ -128,11 +128,12 @@ The CLI groups the public operations by the kind of result you need.
 | `goalchainer show` | A saved request result; a readable account without evaluation | [Plans](#plans-from-goals) |
 | `goalchainer relevance` | Domain inspection, task-review packets and receipt assessment | [Relevance](docs/relevance-review.md) |
 | `goalchainer motivation` | Explicit need observations and host attempts; a durable stream and its snapshot | [Motivation](docs/motivation.md) |
+| `goalchainer step` | A creative controller's step-request and a norm set; an advisory verdict atom | [Step requests](#step-requests) |
 | `goalchainer snars` | Statements and evidence; belief queries, proofs and counterfactuals | [SNARS sessions](#snars-sessions) |
 | `goalchainer directive` | An operation and a caller-selected plan file; a view or explicit lifecycle change | [Coordination](docs/directive-orchestration.md) |
 | `goalchainer diagnose` | A module group and expression; a profile, explanation or match diagnosis | [Diagnostics](#diagnose-a-metta-operation) |
 
-`request`, `motivation`, `directive` and `show` read a JSON object from `--input FILE` or
+`request`, `motivation`, `step`, `directive` and `show` read a JSON object from `--input FILE` or
 standard input. The following sections use the installed `goalchainer` command;
 `python -m goal_chainer.cli` exposes the same interface.
 
@@ -502,6 +503,58 @@ The former Prolog-text arguments are no longer accepted. The protocol now echoes
 the goal as a structured expression. This library change also changes the SNARS
 identity: restart existing processes and start a new store. Old stores are refused
 under the new identity; schema version 3 is unchanged.
+
+<!-- am[implements a-gc-step-request-1104] -->
+## Step requests
+
+A creative controller asks before it dispatches a step that leaves the hive or
+costs money, such as a render job sent to a remote host or a critique sent to an
+outside model. It sends the step as one MeTTa atom:
+
+```metta
+(step-request
+  (op render-job op-17 job-3)
+  (generation s1 r1 t1 c1)
+  (context task-9 maya studio critic-a blender hq)
+  (target provider claude)
+  (leaves (h1 image CC-BY-4.0) (h2 audio CC-BY-NC-4.0))
+  (cost 4 10 usd)
+  (facts ((scene-final c1) unverified ev-9)))
+```
+
+A pool target can say what its host is, `(target pool host-3 trusted)`, with
+`own`, `trusted` or `open`; a pool host given no class is read as open. A leaf can
+carry tags after its licence, `(h3 photo own (unreleased (private maya)))`, and a
+person's consent is a verified fact, `((consent maya h3 claude) verified ev-1)`.
+
+`goalchainer step` takes the atom's text and a norm set, runs the request's
+clauses as facts against the norms on `lib_deontic`, and answers one verdict atom:
+
+```bash
+goalchainer step --input step.json --inference-budget 100000000 --timeout-seconds 60
+```
+
+```json
+{"step_request": "(step-request ...)", "norms": {"packaged": "creative-controller"}}
+```
+
+For the request above the answer's `verdict` is
+`(verdict forbidden ((licence-restricted (send h2 outside-model))) ())`. The
+status is `forbidden` when any rule forbids part of the step, else `obligated`
+when something must hold first, such as `(verify-first (verify (scene-final c1)))`,
+else `permitted`. Each reason pairs the rule that concluded it with what it
+concluded, and the last list holds the evidence refs of the facts those reasons
+rest on. The packaged `creative-controller` norms
+(`src/goal_chainer/norms/creative_controller.metta`) are the controller's own
+rules, so the rule names are theirs: `licence-open`, `licence-restricted`,
+`private-needs-consent`, `unreleased-trusted-only` and `budget-over-left`. A
+`path` selects another norm set, and one shipped with GoalChainer is a file in
+that directory, named as packaged domains are: `my_rules.metta` is `my-rules`.
+A norm form `lib_deontic` cannot read is an
+error, never a rule that quietly stops applying. The verdict is advisory: the
+controller's own gates decide, and the answer carries
+`"authorization": "unresolved"` and `"applies_effects": false`. The Omega plugin
+offers the same request as the `goalchainer-step-request` skill.
 
 ## Omega integration
 

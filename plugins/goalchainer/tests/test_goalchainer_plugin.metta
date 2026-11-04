@@ -56,6 +56,9 @@
 ; am[verifies a-v2-cli-skill-surface-1020@6f755c]
 !(test (py-call (omega_modules.tool_parameters (py-call (providers.getTools (getSkills))) "goalchainer-motivation-dispatch"))
        json_request)
+; am[verifies a-gc-step-request-1104]
+!(test (py-call (omega_modules.tool_parameters (py-call (providers.getTools (getSkills))) "goalchainer-step-request"))
+       json_request)
 
 ; A name the plugin never registered is still no tool, so the checks above discriminate.
 !(test (py-call (omega_modules.tool_parameters (py-call (providers.getTools (getSkills))) "goalchainer-not-a-skill"))

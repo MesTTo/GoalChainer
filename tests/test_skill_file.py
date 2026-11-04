@@ -16,11 +16,13 @@ PYPROJECT = REPO_ROOT / "pyproject.toml"
 # function its definition py-calls.
 # am[verifies a-integrate-domain-surface-1018@759698]
 # am[verifies a-v2-cli-skill-surface-1020@6f755c]
+# am[verifies a-gc-step-request-1104]
 SKILLS = {
     "goalchainer-request": "request",
     "goalchainer-directive-dispatch": "directive_dispatch",
     "goalchainer-snars-dispatch": "dispatch",
     "goalchainer-motivation-dispatch": "motivation_dispatch",
+    "goalchainer-step-request": "step_request",
 }
 
 

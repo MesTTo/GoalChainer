@@ -1,5 +1,5 @@
-"""Purpose: expose domain and motivation requests and a readable account of their results, directive operations,
-relevance reviews, SNARS sessions and bounded developer diagnostics of a MeTTa expression."""
+"""Purpose: expose domain, motivation and step requests and a readable account of their results, directive
+operations, relevance reviews, SNARS sessions and bounded developer diagnostics of a MeTTa expression."""
 
 from __future__ import annotations
 
@@ -23,12 +23,14 @@ from .snars_engine import start_worlds_from_images
 # am[implements a-integrate-cli-typed-errors-1018@160cf8]
 # am[implements a-dg-cli-1019@996a1b]
 # am[implements a-v2-cli-skill-surface-1020@6f755c]
+# am[implements a-gc-step-request-1104]
 def main(argv: list[str] | None = None) -> int:
     arguments = sys.argv[1:] if argv is None else argv
     try:
         return _main(arguments)
     except GoalChainerError as error:
-        if "--json" in arguments or arguments[:1] in (["request"], ["directive"], ["diagnose"], ["motivation"]):
+        if "--json" in arguments or arguments[:1] in (["request"], ["directive"], ["diagnose"], ["motivation"],
+                                                      ["step"]):
             print(json.dumps({"ok": False, "error": error.to_dict()}, sort_keys=True))
         else:
             print(f"GoalChainer error [{error.code}]: {error}", file=sys.stderr)
@@ -40,18 +42,20 @@ def main(argv: list[str] | None = None) -> int:
 # am[implements a-integrate-request-budget-surface-1018@d6882c]
 # am[implements a-dg-cli-1019@996a1b]
 # am[implements a-v2-cli-skill-surface-1020@6f755c]
+# am[implements a-gc-step-request-1104]
 def _main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(prog="goalchainer")
     commands = parser.add_subparsers(dest="command", required=True)
     request_parser = commands.add_parser("request", help="review, plan or admit against a selected domain")
     directive_parser = commands.add_parser("directive", help="apply a typed directive operation")
     motivation_parser = commands.add_parser("motivation", help="record need observations or host attempts, or inspect a stream")
+    step_parser = commands.add_parser("step", help="give a creative controller's step-request its advisory verdict")
     show_parser = commands.add_parser("show", help="print a readable account of a request result")
-    for command in (request_parser, directive_parser, motivation_parser, show_parser):
+    for command in (request_parser, directive_parser, motivation_parser, step_parser, show_parser):
         command.add_argument("--input", default="-", help="JSON input file, or - for standard input")
     snars_parser = commands.add_parser("snars", help="query or update a native SNARS session")
     add_snars_arguments(snars_parser)
-    for command in (request_parser, directive_parser, motivation_parser, snars_parser):
+    for command in (request_parser, directive_parser, motivation_parser, step_parser, snars_parser):
         command.add_argument("--inference-budget", type=int, required=True,
                              help="maximum engine inferences for this request")
         command.add_argument("--timeout-seconds", type=float, required=True,
@@ -89,6 +93,10 @@ def _main(argv: list[str]) -> int:
             from .motivation.requests import run_motivation_request
 
             result = run_motivation_request(payload, budget=budget)
+        elif args.command == "step":
+            from .step_request import run_step_request
+
+            result = run_step_request(payload, budget=budget)
         else:
             result = run_directive_request(payload, budget=budget)
     budget.remaining()
