@@ -523,9 +523,21 @@ outside model. It sends the step as one MeTTa atom:
 ```
 
 A pool target can say what its host is, `(target pool host-3 trusted)`, with
-`own`, `trusted` or `open`; a pool host given no class is read as open. A leaf can
-carry tags after its licence, `(h3 photo own (unreleased (private maya)))`, and a
-person's consent is a verified fact, `((consent maya h3 claude) verified ev-1)`.
+`own`, `trusted` or `open`; a pool host given no class, or one it doesn't know, is
+read as open. A leaf can carry tags after its licence,
+`(h3 photo own (unreleased (private maya)))`, and a person's consent is a verified
+fact, `((consent maya h3 claude) verified ev-1)`.
+
+A leaf made from other assets names them, `(h4 render own ((from h1 h2)))`, and
+gets every tag they carry, through every step back. What it came from is another
+leaf or an asset listed in `(sources (h1 photo own ((private maya))) ...)`, which
+stays home. A fact can end, `((consent maya h3 claude) verified ev-1 (until
+2026-12-01T00:00:00Z))`, and a request can revoke one,
+`((consent maya h3 claude) revoked ev-2)`. A revoked fact, or one whose `until`
+is not after the request's `(at 2026-11-05T09:00:00Z)`, or the time it is answered
+without one, reads as absent; the answer's `at` and `absent` say which. Licences
+are SPDX identifiers or `own`, and the plain Creative Commons names read as their
+current versions, so `CC-BY` is `CC-BY-4.0`.
 
 `goalchainer step` takes the atom's text and a norm set, runs the request's
 clauses as facts against the norms on `lib_deontic`, and answers one verdict atom:

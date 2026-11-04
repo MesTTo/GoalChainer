@@ -1,11 +1,13 @@
 """Purpose: verify the step-request verdict (goal_chainer.step_request): the facts a well-formed step-request gives and
 every malformed one it refuses, the packaged creative-controller norms on pymetta's lib_deontic for each of the
-controller's rules, a differential check against an oracle written from the rules' text alone over generated
-step-requests, the refusal of a norm set lib_deontic would partly skip, and the wire, CLI and skill surfaces."""
+controller's rules and physixCN's answers, a differential check against an oracle written from the rules' and the
+answers' text alone over generated step-requests, the refusal of a norm set lib_deontic would partly skip, and the
+wire, CLI and skill surfaces."""
 
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 
 import pytest
 from hypothesis import HealthCheck, given, settings
@@ -19,12 +21,14 @@ from goal_chainer.runtime.budget import RunBudget
 from goal_chainer.step_request import norms_text, packaged_norm_names, run_step_request, step_facts, verdict
 
 HEAD = "(op render-job op-17 job-3) (generation s1 r1 t1 c1) (context task-9 maya studio critic-a blender hq)"
+AT = "2026-11-05T00:00:00Z"
 _, NORMS = norms_text({"packaged": "creative-controller"})
 
 
 # am[related a-gc-step-request-1104]
-def _step(target="(target provider claude)", leaves="(h1 image CC-BY-4.0)", cost="(cost 4 10 usd)", facts="(facts)"):
-    return f"(step-request {HEAD} {target} (leaves {leaves}) {cost} {facts})"
+def _step(target="(target provider claude)", leaves="(h1 image CC-BY-4.0)", cost="(cost 4 10 usd)", facts="(facts)",
+          extra=""):
+    return f"(step-request {HEAD} {extra} {target} (leaves {leaves}) {cost} {facts})"
 
 
 # am[related a-gc-step-request-1104]
@@ -37,7 +41,7 @@ def test_a_step_request_gives_each_clause_as_a_fact_and_the_exact_destination():
     text = _step(target="(target pool host-3 trusted)",
                  leaves='(h1 image CC-BY-4.0) ("sha256:ab" audio own (unreleased (private maya)))',
                  cost="(cost 12.5 10 usd)", facts="(facts ((scene-final c1) unverified ev-9))")
-    assert step_facts(text) == (
+    assert step_facts(text).facts == (
         "(op render-job op-17 job-3)", "(generation s1 r1 t1 c1)", "(context task-9 maya studio critic-a blender hq)",
         "(target pool host-3 trusted)", "(sends-to host-3)",
         "(leaf h1 image CC-BY-4.0)", '(leaf "sha256:ab" audio own)', '(unreleased "sha256:ab")',
@@ -46,10 +50,33 @@ def test_a_step_request_gives_each_clause_as_a_fact_and_the_exact_destination():
         "(fact (scene-final c1) unverified ev-9)")
 
 
+# The answers' shapes: a class nobody knows given as open, sources and from links given as facts, a fact read at the
+# request's at, and one whose until is not after it, or that is revoked, left out and reported as absent.
+# am[verifies a-gc-ans-pool-open-1104] am[verifies a-gc-ans-derived-tags-1104] am[verifies a-gc-ans-consent-expiry-1104]
+def test_the_answers_shapes_give_their_facts_and_report_what_reads_as_absent():
+    read = step_facts(_step(
+        target="(target pool host-3 partner)", leaves="(h4 render own ((from h1 h2)))",
+        facts="(facts ((consent maya h4 host-3) verified ev-1 (until 2026-11-05T00:00:00Z)) "
+              "((rights-cleared h1) verified ev-2 (until 2026-11-06T00:00:00+11:00)) ((scene-final c1) unverified ev-3) "
+              "((scene-final c1) revoked ev-4))",
+        extra=f"(at {AT}) (sources (h1 photo own ((private maya))) (h2 audio CC0 (unreleased)))"))
+    assert read.at == datetime(2026, 11, 5, tzinfo=timezone.utc)
+    assert read.facts[3:] == (
+        "(target pool host-3 open)", "(sends-to host-3)",
+        "(leaf h4 render own)", "(from h4 h1)", "(from h4 h2)",
+        "(source h1 photo own)", "(private h1 maya)", "(source h2 audio CC0)", "(unreleased h2)",
+        "(cost 4 10 usd)", "(fact (rights-cleared h1) verified ev-2)")
+    assert read.absent == (("(consent maya h4 host-3)", "ev-1", "expired"), ("(scene-final c1)", "ev-3", "revoked"),
+                           ("(scene-final c1)", "ev-4", "revoked"))
+    moment = datetime(2026, 12, 1, tzinfo=timezone.utc)
+    assert step_facts(_step(), now=moment).at == moment
+    assert step_facts(_step(extra=f"(at {AT})"), now=moment).at == datetime(2026, 11, 5, tzinfo=timezone.utc)
+
+
 # am[verifies a-gc-step-request-1104]
 def test_a_cost_at_the_budget_left_is_not_over_it():
-    assert "(over-budget 10 10 usd)" not in step_facts(_step(cost="(cost 10 10 usd)"))
-    assert "(over-budget 10.5 10 usd)" in step_facts(_step(cost="(cost 10.5 10 usd)"))
+    assert "(over-budget 10 10 usd)" not in step_facts(_step(cost="(cost 10 10 usd)")).facts
+    assert "(over-budget 10.5 10 usd)" in step_facts(_step(cost="(cost 10.5 10 usd)")).facts
 
 
 MALFORMED = {
@@ -62,13 +89,24 @@ MALFORMED = {
     "an unknown clause": _step(facts="(facts) (colour red)"),
     "an op of two items": _step().replace("(op render-job op-17 job-3)", "(op render-job op-17)"),
     "a target of another kind": _step(target="(target cloud x)"),
-    "a pool class it doesn't know": _step(target="(target pool host-3 partner)"),
+    "a pool target of four items": _step(target="(target pool host-3 trusted extra)"),
     "a provider with a class": _step(target="(target provider claude trusted)"),
     "a leaf of two items": _step(leaves="(h1 image)"),
     "a leaf named twice": _step(leaves="(h1 image MIT) (h1 audio MIT)"),
+    "a leaf named again as a source": _step(leaves="(h1 image MIT)", extra="(sources (h1 photo own))"),
     "a tag it doesn't know": _step(leaves="(h1 image MIT (draft))"),
     "tags that aren't a list": _step(leaves="(h1 image MIT unreleased)"),
+    "a from naming nothing": _step(leaves="(h1 image MIT ((from)))"),
+    "a from naming an asset no one describes": _step(leaves="(h1 image MIT ((from h9)))"),
+    "an asset made from itself": _step(leaves="(h1 image MIT ((from h1)))"),
+    "a cycle through a source": _step(leaves="(h1 image MIT ((from s1)))", extra="(sources (s1 photo own ((from h1))))"),
+    "a source of two items": _step(extra="(sources (s1 photo))"),
     "a fact of another status": _step(facts="(facts ((x) maybe ev-1))"),
+    "a fact's fourth item that isn't until": _step(facts="(facts ((x) verified ev-1 (after 2026-11-05T00:00:00Z)))"),
+    "an until that isn't a time": _step(facts="(facts ((x) verified ev-1 (until tomorrow)))"),
+    "an until without its offset": _step(facts="(facts ((x) verified ev-1 (until 2026-11-05T00:00:00)))"),
+    "an at of two items": _step(extra=f"(at {AT} {AT})"),
+    "an at that isn't a time": _step(extra="(at now)"),
     "a negative estimate": _step(cost="(cost -1 10 usd)"),
     "a cost that isn't a number": _step(cost="(cost lots 10 usd)"),
     "an infinite budget": _step(cost="(cost 1 inf usd)"),
@@ -150,6 +188,38 @@ VERDICTS = {
     "a step that sends nothing and fits its budget is permitted": (
         _step(leaves=""),
         "(verdict permitted () ())"),
+    "a pool class nobody knows is open": (
+        _step(target="(target pool host-3 partner)", leaves="(h2 audio CC-BY-NC-4.0)"),
+        "(verdict forbidden ((licence-restricted (send h2 open-host))) ())"),
+    "a plain CC name reads as its SPDX version": (
+        _step(leaves="(h1 image CC-BY)"),
+        "(verdict permitted ((licence-open (send h1 outside-model)) "
+        "(attribution-travels (attribution h1 CC-BY-4.0))) ())"),
+    "a plain name SPDX doesn't list is restricted": (
+        _step(leaves="(h1 code BSD)"),
+        "(verdict forbidden ((licence-restricted (send h1 outside-model))) ())"),
+    "what is made from unreleased work is unreleased": (
+        _step(leaves="(h4 render CC-BY-4.0 ((from h1)))", extra="(sources (h1 photo own (unreleased)))"),
+        "(verdict forbidden ((unreleased-trusted-only (send h4 outside-model))) ())"),
+    "what is made from private material is private through every step back": (
+        _step(leaves="(h5 cut own ((from h4)))", extra="(sources (h4 render own ((from h1))) (h1 photo own ((private maya))))"),
+        "(verdict obligated ((private-needs-consent (consent maya h5 claude))) ())"),
+    "a private source that stays home needs no consent": (
+        _step(extra="(sources (h9 photo own ((private maya))))"),
+        "(verdict permitted ((licence-open (send h1 outside-model)) "
+        "(attribution-travels (attribution h1 CC-BY-4.0))) ())"),
+    "consent past its expiry reads as absent": (
+        _step(leaves="(h3 photo own ((private maya)))", extra=f"(at {AT})",
+              facts="(facts ((consent maya h3 claude) verified ev-1 (until 2026-11-01T00:00:00Z)))"),
+        "(verdict obligated ((private-needs-consent (consent maya h3 claude))) ())"),
+    "consent before its expiry lets it go": (
+        _step(leaves="(h3 photo own ((private maya)))", extra=f"(at {AT})",
+              facts="(facts ((consent maya h3 claude) verified ev-1 (until 2027-01-01T00:00:00Z)))"),
+        "(verdict permitted ((licence-open (send h3 outside-model)) (consent-shown (consented maya h3 claude))) (ev-1))"),
+    "revoked consent reads as absent": (
+        _step(leaves="(h3 photo own ((private maya)))",
+              facts="(facts ((consent maya h3 claude) verified ev-1) ((consent maya h3 claude) revoked ev-2))"),
+        "(verdict obligated ((private-needs-consent (consent maya h3 claude))) ())"),
 }
 
 
@@ -160,24 +230,37 @@ def test_each_rule_gives_the_verdict_the_controller_reads(case):
     assert verdict(text, NORMS, budget=_budget()).atom() == expected
 
 
-# The oracle reads the controller's rules as physixCN wrote them (omegahive#11, comment 6607935015) and nothing of
-# the norm set: where a step's leaves may go, what waits for consent or verification, and what the budget forbids.
-OPEN = {"own", "CC0", "CC0-1.0", "MIT", "Apache-2.0", "BSD", "BSD-2-Clause", "BSD-3-Clause",
-        *(f"CC-BY{sa}{version}" for sa in ("", "-SA") for version in ("", "-1.0", "-2.0", "-2.5", "-3.0", "-4.0"))}
-LICENCES = ["own", "CC0-1.0", "CC-BY-4.0", "CC-BY-SA-3.0", "MIT", "Apache-2.0", "BSD-3-Clause",
-            "CC-BY-NC-4.0", "CC-BY-ND-4.0", "CC-BY-NC-SA-4.0", "proprietary", "unknown"]
+# The oracle reads the controller's rules as physixCN wrote them (omegahive#11, comment 6607935015) and their answers
+# (comment 6628012601), and nothing of the norm set: where a step's leaves may go, what waits for consent or
+# verification, and what the budget forbids. Licences are SPDX ids or own, plain CC names their current SPDX versions.
+OPEN = {"own", "CC0-1.0", "MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause",
+        *(f"CC-BY{sa}-{version}" for sa in ("", "-SA") for version in ("1.0", "2.0", "2.5", "3.0", "4.0"))}
+ALIASES = {"CC0": "CC0-1.0", **{f"CC-BY{kind}": f"CC-BY{kind}-4.0" for kind in ("", "-SA", "-NC", "-ND", "-NC-SA",
+                                                                             "-NC-ND")}}
+LICENCES = ["own", "CC0-1.0", "CC0", "CC-BY-4.0", "CC-BY", "CC-BY-SA-3.0", "CC-BY-SA", "MIT", "Apache-2.0",
+            "BSD-3-Clause", "BSD", "CC-BY-NC-4.0", "CC-BY-NC", "CC-BY-ND-4.0", "CC-BY-NC-SA-4.0", "proprietary",
+            "unknown"]
 DESTINATIONS = {("provider", None): "outside-model", ("pool", "own"): "own-machine",
-                ("pool", "trusted"): "trusted-host", ("pool", "open"): "open-host", ("pool", None): "open-host"}
+                ("pool", "trusted"): "trusted-host", ("pool", "open"): "open-host", ("pool", None): "open-host",
+                ("pool", "partner"): "open-host"}
+UNTIL = {"none": None, "past": "2026-11-01T00:00:00Z", "future": "2027-01-01T00:00:00Z"}
 
 
 # am[related a-gc-step-request-1104] am[rests-on c-gc-step-rules-1104]
+# am[rests-on c-gc-physix-answers-1104]
 def _oracle(kind, cls, where, leaves, estimate, left, facts):
-    """(status, {literal: rules that may name it}, evidence refs) for a step, from the rules' text."""
+    """(status, {literal: rules that may name it}, evidence refs) for a step, from the rules' text: each leaf is
+    (name, licence, unreleased, owners), its tags already those of everything it came from, and each fact
+    (fact, status, ref, until)."""
     destination = DESTINATIONS[(kind, cls)]
     untrusted = destination in ("outside-model", "open-host")
+    revoked = {fact for fact, status, _, _ in facts if status == "revoked"}
+    present = [(fact, status, ref) for fact, status, ref, until in facts
+               if fact not in revoked and (until is None or until > AT)]
     forbidden, obligated, permitted, evidence = {}, {}, {}, {"obligated": [], "permitted": []}
-    for name, licence, unreleased, owner in leaves:
+    for name, licence, unreleased, owners in leaves:
         send = f"(send {name} {destination})"
+        licence = ALIASES.get(licence, licence)
         restricted = licence not in OPEN
         rules = {*(["licence-restricted"] if restricted and untrusted else []),
                  *(["unreleased-trusted-only"] if unreleased and untrusted else [])}
@@ -187,9 +270,9 @@ def _oracle(kind, cls, where, leaves, estimate, left, facts):
             permitted[send] = {"licence-restricted-trusted" if restricted else "licence-open"}
         if licence.startswith("CC-BY") and licence in OPEN:
             permitted[f"(attribution {name} {licence})"] = {"attribution-travels"}
-        if owner and destination != "own-machine":
+        for owner in sorted(owners) if destination != "own-machine" else ():
             consent = f"(consent {owner} {name} {where})"
-            ref = next((r for fact, status, r in facts if fact == consent and status == "verified"), None)
+            ref = next((r for fact, status, r in present if fact == consent and status == "verified"), None)
             if ref is None:
                 obligated[consent] = {"private-needs-consent"}
             else:
@@ -197,7 +280,7 @@ def _oracle(kind, cls, where, leaves, estimate, left, facts):
                 evidence["permitted"].append(ref)
     if estimate > left:
         forbidden[f"(auto-dispatch {estimate} {left} usd)"] = {"budget-over-left"}
-    for fact, status, ref in facts:
+    for fact, status, ref in present:
         if status == "unverified":
             obligated[f"(verify {fact})"] = {"verify-first"}
             evidence["obligated"].append(ref)
@@ -208,39 +291,66 @@ def _oracle(kind, cls, where, leaves, estimate, left, facts):
     return "permitted", permitted, evidence["permitted"]
 
 
-_leaves = st.lists(st.tuples(st.sampled_from(LICENCES), st.booleans(), st.sampled_from([None, "maya", "ola"])),
+# Assets as (licence, unreleased, owner, the indexes of the sources it came from), sources only from earlier sources,
+# so no request has a cycle.
+_owner = st.sampled_from([None, "maya", "ola"])
+_leaves = st.lists(st.tuples(st.sampled_from(LICENCES), st.booleans(), _owner, st.sets(st.integers(0, 1))),
                    max_size=3)
-# One fact per name: a fact given twice is one literal the engine supports with one of its refs.
+_sources = st.lists(st.tuples(st.booleans(), _owner, st.sets(st.integers(0, 1))), max_size=2)
+# One fact per name: a fact given twice is one literal the engine supports with one of its refs; the rule table holds
+# a revocation beside the fact it revokes.
 _facts = st.lists(st.tuples(st.sampled_from(["(scene-final c1)", "(rights-cleared a0)", "consent"]),
-                            st.sampled_from(["verified", "unverified"])), max_size=3, unique_by=lambda fact: fact[0])
+                            st.sampled_from(["verified", "unverified", "revoked"]), st.sampled_from(sorted(UNTIL))),
+                  max_size=3, unique_by=lambda fact: fact[0])
 
 
-# am[verifies a-gc-step-request-1104]
-@settings(max_examples=80, deadline=None, suppress_health_check=[HealthCheck.too_slow])
-@given(target=st.sampled_from(sorted(DESTINATIONS, key=str)), leaves=_leaves,
+# am[related a-gc-ans-derived-tags-1104]
+def _asset_text(name, licence, unreleased, owner, origins):
+    tags = [*(["unreleased"] if unreleased else []), *([f"(private {owner})"] if owner else []),
+            *([f"(from {' '.join(origins)})"] if origins else [])]
+    return f"({name} image {licence}{' (' + ' '.join(tags) + ')' if tags else ''})"
+
+
+# am[verifies a-gc-step-request-1104] am[verifies a-gc-ans-pool-open-1104] am[verifies a-gc-ans-spdx-1104]
+# am[verifies a-gc-ans-consent-expiry-1104] am[verifies a-gc-ans-derived-tags-1104]
+@settings(max_examples=120, deadline=None, suppress_health_check=[HealthCheck.too_slow])
+@given(target=st.sampled_from(sorted(DESTINATIONS, key=str)), leaves=_leaves, sources=_sources,
        estimate=st.sampled_from([0, 4, 10, 12]), facts=_facts, consent_for=st.sampled_from(["claude", "host-3"]))
-def test_the_norms_agree_with_the_rules_as_written(target, leaves, estimate, facts, consent_for):
+def test_the_norms_agree_with_the_rules_as_written(target, leaves, sources, estimate, facts, consent_for):
     kind, cls = target
     where = "claude" if kind == "provider" else "host-3"
-    named = [(f"a{i}", licence, unreleased, owner) for i, (licence, unreleased, owner) in enumerate(leaves)]
-    owners = [(name, owner) for name, _, _, owner in named if owner]
+    # Each source's tags with everything it came from, earlier sources only; then each leaf's alike.
+    inherited = []
+    for i, (unreleased, owner, origins) in enumerate(sources):
+        origins = sorted(j for j in origins if j < i)
+        tags = (unreleased or any(inherited[j][0] for j in origins),
+                {owner} - {None} | {person for j in origins for person in inherited[j][1]})
+        inherited.append((*tags, origins, unreleased, owner))
+    named = []
+    for i, (licence, unreleased, owner, origins) in enumerate(leaves):
+        origins = sorted(j for j in origins if j < len(sources))
+        named.append((f"a{i}", licence, unreleased or any(inherited[j][0] for j in origins),
+                      {owner} - {None} | {person for j in origins for person in inherited[j][1]}, origins,
+                      unreleased, owner))
+    owners = [(name, owner) for name, _, _, everyone, *_ in named for owner in sorted(everyone)]
     written = []
-    for i, (fact, status) in enumerate(facts):
+    for i, (fact, status, until) in enumerate(facts):
         if fact == "consent":
             if not owners:
                 continue
             name, owner = owners[i % len(owners)]
             fact = f"(consent {owner} {name} {consent_for})"
-        written.append((fact, status, f"ev-{i}"))
+        written.append((fact, status, f"ev-{i}", UNTIL[until]))
     target_text = f"(target {kind} {where}{'' if cls is None else ' ' + cls})"
-    leaf_text = " ".join(
-        f"({name} image {licence}"
-        + ("" if not (unreleased or owner) else
-           " (" + " ".join([*(["unreleased"] if unreleased else []), *([f"(private {owner})"] if owner else [])]) + ")")
-        + ")" for name, licence, unreleased, owner in named)
-    fact_text = " ".join(f"({fact} {status} {ref})" for fact, status, ref in written)
-    text = _step(target=target_text, leaves=leaf_text, cost=f"(cost {estimate} 10 usd)", facts=f"(facts {fact_text})")
-    status, reasons, evidence = _oracle(kind, cls, where, named, estimate, 10, written)
+    leaf_text = " ".join(_asset_text(name, licence, unreleased, owner, [f"s{j}" for j in origins])
+                         for name, licence, _, _, origins, unreleased, owner in named)
+    source_text = " ".join(_asset_text(f"s{i}", "own", unreleased, owner, [f"s{j}" for j in origins])
+                           for i, (_, _, origins, unreleased, owner) in enumerate(inherited))
+    fact_text = " ".join(f"({fact} {status} {ref}{'' if until is None else f' (until {until})'})"
+                         for fact, status, ref, until in written)
+    text = _step(target=target_text, leaves=leaf_text, cost=f"(cost {estimate} 10 usd)", facts=f"(facts {fact_text})",
+                 extra=f"(at {AT})" + (f" (sources {source_text})" if sources else ""))
+    status, reasons, evidence = _oracle(kind, cls, where, [leaf[:4] for leaf in named], estimate, 10, written)
     answer = verdict(text, NORMS, budget=_budget())
     assert answer.status == status, text
     assert {literal for _, literal in answer.reasons} == set(reasons), text
@@ -257,13 +367,17 @@ def test_a_norm_set_lib_deontic_would_partly_skip_is_refused():
 
 # am[verifies a-gc-step-request-1104]
 def test_the_wire_answer_is_advisory_and_refuses_other_fields():
-    answer = run_step_request({"step_request": _step(), "norms": {"packaged": "creative-controller"}},
+    answer = run_step_request({"step_request": _step(extra=f"(at {AT})"), "norms": {"packaged": "creative-controller"}},
                               budget=_budget())
     assert answer["protocol"] == "goalchainer-step-request-v1" and answer["norms"] == "creative-controller"
     assert answer["verdict"] == VERDICTS["an open asset goes anywhere, its attribution with it"][1]
     assert answer["authorization"] == "unresolved" and answer["applies_effects"] is False
     assert answer["reasons"][0] == {"rule": "licence-open", "literal": "(send h1 outside-model)"}
     assert answer["inferences"] > 0 and answer["support"][0]["label"] == "licence-open"
+    assert answer["at"] == "2026-11-05T00:00:00+00:00" and answer["absent"] == []
+    revoked = run_step_request({"step_request": _step(facts="(facts ((scene-final c1) revoked ev-4))"),
+                                "norms": {"packaged": "creative-controller"}}, budget=_budget())
+    assert revoked["absent"] == [{"fact": "(scene-final c1)", "ref": "ev-4", "why": "revoked"}]
     for payload in ({"step_request": _step()}, {"step_request": "", "norms": {"packaged": "creative-controller"}},
                     {"step_request": _step(), "norms": {"packaged": "creative-controller"}, "extra": 1}):
         with pytest.raises(InvalidInputError):
