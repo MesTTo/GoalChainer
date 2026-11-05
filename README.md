@@ -505,6 +505,7 @@ identity: restart existing processes and start a new store. Old stores are refus
 under the new identity; schema version 3 is unchanged.
 
 <!-- am[implements a-gc-step-request-1104] -->
+<!-- am[implements a-gc-lic-docs-1105] -->
 ## Step requests
 
 A creative controller asks before it dispatches a step that leaves the hive or
@@ -531,13 +532,22 @@ fact, `((consent maya h3 claude) verified ev-1)`.
 A leaf made from other assets names them, `(h4 render own ((from h1 h2)))`, and
 gets every tag they carry, through every step back. What it came from is another
 leaf or an asset listed in `(sources (h1 photo own ((private maya))) ...)`, which
-stays home. A fact can end, `((consent maya h3 claude) verified ev-1 (until
+stays home. Its sources' licences bind it the same way, `own` never loosening
+them: a render of a `CC-BY-NC-4.0` clip is restricted, one of a `CC-BY-SA-3.0`
+clip must be shared alike and credit the clip, and sources whose share-alike
+licences can't be combined, such as `CC-BY-SA-1.0` and `CC-BY-SA-4.0`, leave it
+restricted. Only a step a person approved relicenses an `own` asset, reported as
+the fact `((relicence h4 CC-BY-4.0 maya 2026-11-04T09:00:00Z) verified ev-7)`
+with who approved it and when, and what the asset was made from still binds it.
+A fact can end, `((consent maya h3 claude) verified ev-1 (until
 2026-12-01T00:00:00Z))`, and a request can revoke one,
 `((consent maya h3 claude) revoked ev-2)`. A revoked fact, or one whose `until`
 is not after the request's `(at 2026-11-05T09:00:00Z)`, or the time it is answered
 without one, reads as absent; the answer's `at` and `absent` say which. Licences
 are SPDX identifiers or `own`, and the plain Creative Commons names read as their
-current versions, so `CC-BY` is `CC-BY-4.0`.
+current versions, so `CC-BY` is `CC-BY-4.0`. Every time a request or an answer
+carries, `until`, `at` and a relicence's, is ISO 8601 in UTC to the second, in
+exactly this form: `2026-11-05T09:00:00Z`.
 
 `goalchainer step` takes the atom's text and a norm set, runs the request's
 clauses as facts against the norms on `lib_deontic`, and answers one verdict atom:
@@ -560,6 +570,9 @@ rest on. The packaged `creative-controller` norms
 (`src/goal_chainer/norms/creative_controller.metta`) are the controller's own
 rules, so the rule names are theirs: `licence-open`, `licence-restricted`,
 `private-needs-consent`, `unreleased-trusted-only` and `budget-over-left`. A
+permitted step also notes what its leaves ask of whoever receives them:
+`(attribution h1 CC-BY-4.0)`, `(attribution-from h4 h1 CC-BY-SA-3.0)` for a
+source's credit, and `(share-alike h4 cc-by-sa)`. A
 `path` selects another norm set, and one shipped with GoalChainer is a file in
 that directory, named as packaged domains are: `my_rules.metta` is `my-rules`.
 A norm form `lib_deontic` cannot read is an

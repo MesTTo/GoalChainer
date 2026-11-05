@@ -17,9 +17,12 @@ physixCN's controller (omegahive#11) asks before it dispatches a step that leave
 
 CLASS says what a pool host is, own (one of the hive's own machines), trusted (enrolled by a person) or open, and any
 other class reads as open, the strictest. An asset's tags are unreleased, (private PERSON) and (from HASH ...), the
-leaves or sources it was made from, whose tags the norms give it. A TIME is an ISO 8601 timestamp with its offset, such
-as 2026-12-01T00:00:00Z. A revoked fact, and one whose until is not after the request's at, or the time it is answered
-without one, reads as absent, every other status of the same FACT with it. It reads back one atom,
+leaves or sources it was made from, whose tags the norms give it, and whose licences bind it: every restriction, share-
+alike family and credit they carry, two share-alike families reading as restricted. Only a person's approved step
+relicenses an own asset, the fact (relicence HASH LICENCE PERSON TIME) naming who approved it and when. A TIME is
+ISO 8601 in UTC, to the second, 2026-12-01T00:00:00Z, the form the answer's at takes too. A revoked fact, and one
+whose until is not after the request's at, or the time it is answered without one, reads as absent, every other
+status of the same FACT with it. It reads back one atom,
 
     (verdict STATUS (REASON ...) (EVIDENCE-REF ...))
 
@@ -65,8 +68,13 @@ FACT_STATUSES = ("verified", "unverified", "revoked")
 # The forms of a lib_deontic theory that become one ingested rule each (DeonticRun.rules); prefer only ranks them.
 _RULE_FORMS = frozenset({"given", "normally", "always", "except"})
 _THEORY_FORMS = _RULE_FORMS | {"prefer"}
-# Proved non-deontic literals a permitted verdict reports beside its permissions.
-_NOTES = frozenset({"attribution", "consented"})
+# Proved non-deontic literals a permitted verdict reports beside its permissions: what a leaf's licence and its sources'
+# ask of whoever receives it, and the consent shown.
+# am[implements a-gc-lic-norms-1105]
+_NOTES = frozenset({"attribution", "attribution-from", "share-alike", "consented"})
+# One spelling of a time, ISO 8601 in UTC to the second, as physixCN asked (omegahive#11, comment 6653935601).
+# am[implements a-gc-lic-reader-1105]
+TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 __all__ = ["STEP_REQUEST_PROTOCOL", "StepFacts", "StepVerdict", "packaged_norm_names", "run_step_request",
            "step_facts", "verdict"]
@@ -109,7 +117,7 @@ class StepVerdict:
             "reasons": [{"rule": label, "literal": literal} for label, literal in self.reasons],
             "evidence": list(self.evidence),
             "support": [node.to_dict() for node in self.support],
-            "at": self.at.isoformat(),
+            "at": self.at.strftime(TIME_FORMAT),
             "absent": [{"fact": fact, "ref": ref, "why": why} for fact, ref, why in self.absent],
         }
 
@@ -231,13 +239,14 @@ def step_facts(text: str, *, now: datetime | None = None) -> StepFacts:
     if missing:
         raise InvalidInputError(f"The step-request lacks {', '.join(missing)}.", details={"missing": missing})
     at = (_time(clauses["at"][0], "The step-request's at") if "at" in clauses
-          else now or datetime.now(timezone.utc))
+          else now or datetime.now(timezone.utc).replace(microsecond=0))
 
     facts = [emit([Symbol(name), *clauses[name]]) for name in ("op", "generation", "context")]
     facts += _target_facts(clauses["target"])
-    facts += _asset_facts(clauses["leaves"], clauses.get("sources", []))
+    assets, licences = _asset_facts(clauses["leaves"], clauses.get("sources", []))
+    facts += assets
     facts += _cost_facts(clauses["cost"])
-    stated, absent = _fact_facts(clauses["facts"], at)
+    stated, absent = _fact_facts(clauses["facts"], at, licences)
     return StepFacts((*facts, *stated), at, tuple(absent))
 
 
@@ -258,12 +267,12 @@ def _target_facts(items: list[Atom]) -> list[str]:
 # Leaves are the assets that would leave the hive and sources what they were made from, both (HASH KIND LICENCE)
 # with an optional (TAG ...) of unreleased, (private PERSON) and (from HASH ...). Each hash names one asset, each from
 # names one the request describes, and no asset comes from itself however far back, so every tag a derived asset
-# inherits is known.
+# inherits is known. Returns the facts and each asset's licence as stated, which a relicence must find own.
 # Time: linear in the assets and their from links.
 # am[implements a-gc-step-request-1104] am[implements a-gc-ans-derived-tags-1104]
-def _asset_facts(leaves: list[Atom], sources: list[Atom]) -> list[str]:
+def _asset_facts(leaves: list[Atom], sources: list[Atom]) -> tuple[list[str], dict[str, str]]:
     facts: list[str] = []
-    named: set[str] = set()
+    licences: dict[str, str] = {}
     came_from: dict[str, list[str]] = {}
     for head, items in (("leaf", leaves), ("source", sources)):
         for asset in items:
@@ -272,9 +281,9 @@ def _asset_facts(leaves: list[Atom], sources: list[Atom]) -> list[str]:
                 raise InvalidInputError(
                     f"A {head} is (HASH KIND LICENCE) or (HASH KIND LICENCE (TAG ...)), not {emit(asset)}.")
             name = emit(asset[0])
-            if name in named:
+            if name in licences:
                 raise InvalidInputError(f"The step-request describes {name} twice.")
-            named.add(name)
+            licences[name] = emit(asset[2])
             facts.append(emit([Symbol(head), *asset[:3]]))
             tags = asset[3] if len(asset) == 4 else []
             if not isinstance(tags, list):
@@ -293,13 +302,13 @@ def _asset_facts(leaves: list[Atom], sources: list[Atom]) -> list[str]:
                     raise InvalidInputError(
                         f"A {head}'s tag is unreleased, (private PERSON) or (from HASH ...), not {emit(tag)}.")
     for name, origins in came_from.items():
-        unknown = [origin for origin in origins if origin not in named]
+        unknown = [origin for origin in origins if origin not in licences]
         if unknown:
             raise InvalidInputError(f"{name} comes from {', '.join(unknown)}, which neither leaves nor sources describe.")
     cyclic = _cyclic(came_from)
     if cyclic:
         raise InvalidInputError(f"These assets come from themselves through their from links: {', '.join(cyclic)}.")
-    return facts
+    return facts, licences
 
 
 # Kahn's topological order over the from links: an asset is placed once everything it came from is, so whatever is
@@ -333,9 +342,13 @@ def _cost_facts(items: list[Atom]) -> list[str]:
 # A fact is (FACT STATUS REF), or (FACT STATUS REF (until TIME)). A FACT the request revokes reads as absent whatever
 # else it says of it, and so does a fact whose until is not after `at`, since consent that has expired or been
 # revoked is absent (physixCN on omegahive#11); lib_deontic has no clock, so this is decided as the facts are read.
+# A relicence is checked here, against the assets' stated licences, since one the norms could not match would leave
+# its asset's licence as it was without a word.
 # Time: two passes over the facts.
 # am[implements a-gc-step-request-1104] am[implements a-gc-ans-consent-expiry-1104]
-def _fact_facts(items: list[Atom], at: datetime) -> tuple[list[str], list[tuple[str, str, str]]]:
+# am[implements a-gc-lic-reader-1105]
+def _fact_facts(items: list[Atom], at: datetime,
+                licences: Mapping[str, str]) -> tuple[list[str], list[tuple[str, str, str]]]:
     read: list[tuple[list[Atom], datetime | None]] = []
     revoked: set[str] = set()
     for item in items:
@@ -344,6 +357,7 @@ def _fact_facts(items: list[Atom], at: datetime) -> tuple[list[str], list[tuple[
             raise InvalidInputError(
                 f"A fact is (FACT STATUS REF) or (FACT STATUS REF (until TIME)), STATUS one of "
                 f"{', '.join(FACT_STATUSES)}, not {emit(item)}.")
+        _relicence(item[0], licences)
         until = None
         if len(item) == 4:
             if not _pair(item[3], "until"):
@@ -364,6 +378,21 @@ def _fact_facts(items: list[Atom], at: datetime) -> tuple[list[str], list[tuple[
     return facts, absent
 
 
+# A relicence is (relicence HASH LICENCE PERSON TIME): a person's approved step giving an own asset the request
+# describes a new licence, PERSON who approved it and TIME when (physixCN on omegahive#11, comment 6653935601).
+# am[implements a-gc-lic-reader-1105]
+def _relicence(fact: Atom, licences: Mapping[str, str]) -> None:
+    if not (isinstance(fact, list) and fact and fact[0] == Symbol("relicence")):
+        return
+    if len(fact) != 5 or not all(isinstance(part, Symbol | StringLiteral) for part in fact[1:4]):
+        raise InvalidInputError(f"A relicence is (relicence HASH LICENCE PERSON TIME), not {emit(fact)}.")
+    if licences.get(emit(fact[1])) != "own":
+        raise InvalidInputError(
+            f"A relicence names an own asset the step-request describes, not {emit(fact[1])}: only an own asset is "
+            f"its owner's to relicense.")
+    _time(fact[4], "A relicence's time")
+
+
 # am[implements a-gc-step-request-1104]
 def _pair(atom: Atom, head: str) -> bool:
     """Whether `atom` is (HEAD NAME), its NAME a symbol or a string."""
@@ -372,17 +401,19 @@ def _pair(atom: Atom, head: str) -> bool:
             and isinstance(atom[1], Symbol | StringLiteral))
 
 
-# A time is an ISO 8601 timestamp with its offset, 2026-12-01T00:00:00Z: one without could be any zone's.
-# am[implements a-gc-ans-consent-expiry-1104]
+# A time is ISO 8601 in UTC to the second, 2026-12-01T00:00:00Z, one spelling for every time a request or answer
+# carries: one without its zone could be any zone's, and one in another zone is the same instant spelled two ways.
+# am[implements a-gc-ans-consent-expiry-1104] am[implements a-gc-lic-reader-1105]
 def _time(atom: Atom, what: str) -> datetime:
     text = atom.text if isinstance(atom, Symbol) else atom.value if isinstance(atom, StringLiteral) else ""
     try:
-        moment = datetime.fromisoformat(text) if text else None
+        moment = datetime.strptime(text, TIME_FORMAT).replace(tzinfo=timezone.utc)
     except ValueError:
         moment = None
-    if moment is None or moment.utcoffset() is None:
+    # strptime also reads unpadded fields, 2026-1-5T0:0:0Z, so only a time that prints back as written is the one form.
+    if moment is None or moment.strftime(TIME_FORMAT) != text:
         raise InvalidInputError(
-            f"{what} is an ISO 8601 time with its offset, such as 2026-12-01T00:00:00Z, not {emit(atom)}.")
+            f"{what} is an ISO 8601 time in UTC to the second, such as 2026-12-01T00:00:00Z, not {emit(atom)}.")
     return moment
 
 
