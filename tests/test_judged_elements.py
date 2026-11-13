@@ -35,6 +35,7 @@ from goal_chainer.judged_elements import (
 from goal_chainer.pipeline import decide_incident
 from goal_chainer.snars_decision import native_decision_payload
 from goal_chainer.snars_models import (
+    EvidenceCounts,
     SnarsDependencyUnavailableError,
     SnarsInvalidInputError,
     SnarsPersistenceError,
@@ -220,15 +221,13 @@ def test_a_failing_judge_command_is_a_structured_error(monkeypatch) -> None:
 class _BelievingSession:
     """The parts of a SNARS session believe_elements uses, recording each belief."""
 
-    def __init__(self, requests=("the request",), *, assert_request_context=False) -> None:
+    def __init__(self, *, assert_request_context=False) -> None:
         self.assert_request_context = assert_request_context
         self.builder = SnarsProgramBuilder(_runtime())
-        self.store = SimpleNamespace(events=lambda: tuple(
-            SimpleNamespace(kind="ingest_text", payload={"text": text}) for text in requests))
         self.beliefs = []
 
-    def believe(self, statement, *, evidence, source):
-        self.beliefs.append((statement, evidence, source))
+    def believe(self, statement, *, evidence, source, accumulate):
+        self.beliefs.append((statement, evidence, source, accumulate))
         return statement
 
 
@@ -251,22 +250,27 @@ def test_believing_skips_vacuous_elements_and_names_the_judge() -> None:
     session: Any = _BelievingSession()
     opinions = judged_elements("anything", run=lambda pairs: _rows(pairs, {EMAILS: (0.9, 0.05)}))
 
-    beliefs = believe_elements(session, opinions)
+    beliefs = believe_elements(session, opinions, "anything")
 
     assert list(beliefs) == ["sensitive-data"]
-    ((statement, evidence, source),) = session.beliefs
+    ((statement, evidence, source, accumulate),) = session.beliefs
     assert statement == '(sn p so "has-property" ((arg s (sn c "request")) (arg o (sn c "sensitive-data"))))'
     assert source == SOURCE == "semrewrite:nli-deberta-large"
     assert evidence == opinions["sensitive-data"].evidence
+    assert len(accumulate) == 16
 
 
-# am[verifies a-gcje-believe]
-def test_believing_refuses_a_store_holding_another_request() -> None:
+# am[verifies a-gcsi-replay-revising-event]
+def test_believing_keys_each_request_as_its_own_observation() -> None:
     opinions = judged_elements("anything", run=lambda pairs: _rows(pairs, {EMAILS: (0.9, 0.0)}))
-    with pytest.raises(SnarsPersistenceError, match="one request per SNARS store"):
-        believe_elements(_fake(_BelievingSession(("first request", "second request"))), opinions)
+    session: Any = _BelievingSession()
+    for request in ("first request", "second request", "first request"):
+        believe_elements(session, opinions, request)
+
+    first, second, again = (accumulate for *_, accumulate in session.beliefs)
+    assert first == again != second
     with pytest.raises(SnarsInvalidInputError, match="one opinion for each element"):
-        believe_elements(_fake(_BelievingSession()), {"sensitive-data": opinions["sensitive-data"]})
+        believe_elements(_fake(_BelievingSession()), {"sensitive-data": opinions["sensitive-data"]}, "request")
 
 
 # am[verifies a-goalchainer-judged-elements.judged-path]
@@ -282,7 +286,7 @@ def test_reading_request_elements_follows_the_reading(monkeypatch) -> None:
     opinions = read_request_elements(_fake(judged), REQUEST, "judged")
 
     assert opinions is not None and opinions["sensitive-data"].statement == EMAILS
-    assert [source for _, _, source in judged.beliefs] == [SOURCE]
+    assert [source for _, _, source, _ in judged.beliefs] == [SOURCE]
 
 
 # am[verifies a-gcje-believe]
@@ -333,6 +337,25 @@ def test_the_session_flag_reaches_its_batches_and_an_identical_belief_is_recorde
                for p in runtime.programs)
     # The repeat replays the stored belief and adds no second believe! effect.
     assert _effects(runtime.programs[1]).count("(believe!") == 1
+
+
+# am[verifies a-gcsi-replay-revising-event]
+def test_accumulating_beliefs_enter_snars_as_one_summed_belief() -> None:
+    runtime = _RecordingRuntime()
+    with SnarsSession.ephemeral(_fake(runtime), assert_request_context=False) as session:
+        session.believe(STATEMENT, evidence=EvidenceCounts(2.0, 0.5, 0.4), source="judge", accumulate="first")
+        session.believe(STATEMENT, evidence=EvidenceCounts(1.0, 0.25, 0.4), source="judge", accumulate="second")
+        session.believe(STATEMENT, evidence=EvidenceCounts(2.0, 0.5, 0.4), source="judge", accumulate="first")
+        assert len(session.store.events()) == 2
+        with pytest.raises(SnarsPersistenceError, match="disagree"):
+            session.believe(STATEMENT, evidence=EvidenceCounts(1.0, 0.0, 0.5), source="judge", accumulate="third")
+        session.believe(STATEMENT, evidence=EvidenceCounts(1.0, 0.0, 0.5), source="other")
+        with pytest.raises(SnarsPersistenceError, match="plain and an accumulating"):
+            session.believe(STATEMENT, evidence=EvidenceCounts(1.0, 0.0, 0.5), source="other", accumulate="x")
+
+    second = _effects(runtime.programs[1])
+    assert second.count("(believe!") == 1
+    assert "(evidence 3.0 0.75)" in second and '(source "judge")' in second
 
 
 # am[verifies a-goalchainer-judged-elements.judged-path]
@@ -395,6 +418,28 @@ def test_native_judged_replay_is_structurally_identical(monkeypatch, tmp_path) -
     assert first["state"]["event_count"] == second["state"]["event_count"]
     assert first["decisions"] == second["decisions"]
     assert first["elements"] == second["elements"]
+
+
+# am[verifies a-gcsi-replay-revising-event]
+def test_native_judged_store_takes_a_second_request(monkeypatch, tmp_path) -> None:
+    unverified = "The facts are unverified."
+    assert unverified in STATEMENTS["unverified"]
+    monkeypatch.setenv("GOALCHAINER_ELEMENTS", "judged")
+    database = tmp_path / "judged-two.sqlite3"
+
+    _fake_judge(monkeypatch, {EMAILS: (0.95, 0.0)})
+    first = native_decision_payload(REQUEST, store_path=database)
+    _fake_judge(monkeypatch, {EMAILS: (0.95, 0.0), unverified: (0.9, 0.0)})
+    second = native_decision_payload(unverified, store_path=database)
+
+    # Each request is one observation from the one judge source; the store believes their evidence summed.
+    one = first["elements"]["opinions"]["sensitive-data"]["evidence"]["positive"]
+    context = second["request_context"]
+    assert context["sensitive"]["sources"] == [SOURCE]
+    assert context["sensitive"]["evidence"]["positive"] == pytest.approx(2 * one, rel=1e-6)
+    assert context["unverified"]["evidence"]["positive"] == pytest.approx(
+        second["elements"]["opinions"]["unverified"]["evidence"]["positive"], rel=1e-6)
+    assert second["decisions"][0]["action_id"] == "hold_external_update"
 
 
 # am[verifies a-goalchainer-judged-elements.judged-path]

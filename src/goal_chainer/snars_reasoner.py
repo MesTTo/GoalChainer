@@ -286,13 +286,18 @@ class SnarsSession:
         trust: float = 1.0,
         occurrence: float | None = None,
         proof_depth: int = DEFAULT_PROOF_DEPTH,
+        accumulate: str | None = None,
     ) -> SnarsBelief:
         """Believe `statement` at `evidence` from `source`. Believing the identical event again records nothing new,
-        as ingest_text and register_goal do, since SNARS's receipt for the source and statement already holds it."""
+        as ingest_text and register_goal do, since SNARS's receipt for the source and statement already holds it.
+
+        With an `accumulate` key the belief is one observation among several from this source on this statement:
+        each batch believes the sum of their evidence once (_accumulated), so a second observation, under another
+        key, adds to the first where SNARS's receipt would otherwise drop it."""
 
         atom = self.builder.codec.statement(statement)
         counts = evidence or EvidenceCounts(1.0, 0.0, 0.5)
-        payload = {
+        payload: dict[str, Any] = {
             "statement": self.builder.codec.emit(atom),
             "positive": counts.positive,
             "negative": counts.negative,
@@ -301,6 +306,8 @@ class SnarsSession:
             "trust": _probability("trust", trust),
             "occurrence": occurrence,
         }
+        if accumulate is not None:
+            payload["accumulate"] = _nonempty("accumulate", accumulate)
         prepared = self.store.prepare_payload("belief", payload)
         duplicate = self._has_event("belief", prepared)
         if not duplicate:
@@ -754,12 +761,11 @@ class SnarsSession:
     ) -> ProtocolEnvelope:
         facts: list[str] = []
         effects: list[str] = []
-        for event in self.store.events():
-            fragments = _event_fragments(event.kind, event.payload, self.builder)
-            facts.extend(fragments.facts)
-            effects.extend(fragments.effects)
+        events = [(event.kind, event.payload) for event in self.store.events()]
         if pending is not None:
-            fragments = _event_fragments(pending[0], pending[1], self.builder)
+            events.append(pending)
+        for kind, payload in _accumulated(events):
+            fragments = _event_fragments(kind, payload, self.builder)
             facts.extend(fragments.facts)
             effects.extend(fragments.effects)
         effects.extend(extra_effects)
@@ -794,6 +800,58 @@ class SnarsSession:
             event.kind == kind and event.payload == payload
             for event in self.store.events()
         )
+
+
+# am[implements a-gcsi-replay-revising-event]
+def _accumulated(
+    events: list[tuple[str, Mapping[str, Any]]],
+) -> list[tuple[str, Mapping[str, Any]]]:
+    """The events with every accumulating belief folded into one belief per source and statement, at the first
+    one's place, its evidence the sum of theirs (cumulative fusion in evidence space) and its base rate, trust and
+    occurrence theirs, which must agree. SNARS keeps one reading per source and statement, so the sum, believed
+    once at the source's trust option, is how one source's readings of several observations enter it; a single
+    accumulating belief is believed as it is. A source's plain belief on the same statement would hold its receipt
+    first and silently drop the sum, so the two cannot mix.
+
+    Time: one pass over the events with a dictionary lookup each."""
+
+    folded: list[tuple[str, Mapping[str, Any]]] = []
+    groups: dict[tuple[Any, Any], int] = {}
+    plain: set[tuple[Any, Any]] = set()
+    for kind, payload in events:
+        if kind != "belief":
+            folded.append((kind, payload))
+            continue
+        key = (payload.get("statement"), payload.get("source"))
+        if payload.get("accumulate") is None:
+            plain.add(key)
+            folded.append((kind, payload))
+        elif key not in groups:
+            groups[key] = len(folded)
+            folded.append((kind, {name: value for name, value in payload.items() if name != "accumulate"}))
+        else:
+            index = groups[key]
+            held = folded[index][1]
+            for name in ("base_rate", "trust", "occurrence"):
+                if held.get(name) != payload.get(name):
+                    raise SnarsPersistenceError(
+                        "Accumulating beliefs from one source on one statement disagree.",
+                        details={"statement": key[0], "source": key[1], "field": name},
+                    )
+            folded[index] = (
+                kind,
+                {
+                    **held,
+                    "positive": _number(held, "positive") + _number(payload, "positive"),
+                    "negative": _number(held, "negative") + _number(payload, "negative"),
+                },
+            )
+        if key in plain and key in groups:
+            raise SnarsPersistenceError(
+                "A source holds both a plain and an accumulating belief on one statement.",
+                details={"statement": key[0], "source": key[1]},
+            )
+    return folded
 
 
 def _event_fragments(

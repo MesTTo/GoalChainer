@@ -149,8 +149,10 @@ PYTHONPATH=src python3 -m goal_chainer.cli demo --json \
 Without `GOALCHAINER_SEMREWRITE`, GoalChainer runs `semrewrite` from `PATH`. A
 judge that cannot start, fails, times out or answers out of contract is a
 structured error, never a fall back to the word lists. Judged elements are
-native only, and a persistent store holds one request in this mode, since SNARS
-keeps one reading per source and statement. `benchmarks/judged_elements.py`
+native only. A persistent store may hold several requests: each request's
+reading of an element is one observation from the judge's one source, and the
+store believes their summed evidence, which SNARS discounts by the source's
+trust once. `benchmarks/judged_elements.py`
 fits the judge's trust and base rates on `tests/fixtures/judged_requests.json`
 and reports them on the held-out `tests/fixtures/judged_requests_heldout.json`.
 

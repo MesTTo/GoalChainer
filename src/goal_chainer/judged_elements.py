@@ -6,6 +6,7 @@ names the semrewrite command, else semrewrite is found on PATH."""
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import os
@@ -21,7 +22,6 @@ from .snars_models import (
     SnarsBelief,
     SnarsDependencyUnavailableError,
     SnarsInvalidInputError,
-    SnarsPersistenceError,
     SnarsProtocolError,
     SnarsTimeoutError,
     SubjectiveOpinion,
@@ -226,26 +226,21 @@ def judged_elements(
 def believe_elements(
     session: SnarsSession,
     opinions: Mapping[str, ElementOpinion],
+    request: str,
 ) -> dict[str, SnarsBelief]:
     """Believe each element the judge holds an opinion on, `(gc action-property "request" <element>)` at the evidence
     its opinion reads back as, from the judge's source. A vacuous opinion is skipped, as the keyword policy asserts
-    nothing for a label it does not find. SNARS keeps one reading per source and statement, so a store holding another
-    request would keep that request's reading and drop this one's: it is refused."""
+    nothing for a label it does not find. Each belief is one observation keyed by `request`, so a store holding
+    several requests believes, for each element, the sum of the judge's evidence from every request under its one
+    source, at the trust option every other source has: SNARS discounts it by trust times the source's learned
+    reliability once, and a one-request store believes what one reading gives (a-gcsi-replay-revising-event)."""
 
     if set(opinions) != set(ELEMENTS):
         raise SnarsInvalidInputError(
             "Judged elements need one opinion for each element.",
             details={"expected": list(ELEMENTS), "received": sorted(opinions)},
         )
-    requests = {event.payload.get("text") for event in session.store.events() if event.kind == "ingest_text"}
-    if len(requests) > 1:
-        raise SnarsPersistenceError(
-            "Judged elements read one request per SNARS store.",
-            details={
-                "requests": len(requests),
-                "remedy": "Use a new store for each request when GOALCHAINER_ELEMENTS=judged.",
-            },
-        )
+    observation = hashlib.sha256(request.encode("utf-8")).hexdigest()[:16]
     codec = session.builder.codec
     beliefs: dict[str, SnarsBelief] = {}
     for element in ELEMENTS:
@@ -253,7 +248,7 @@ def believe_elements(
         if evidence is None:
             continue
         statement = codec.emit(codec.binary_statement("has-property", "request", element))
-        beliefs[element] = session.believe(statement, evidence=evidence, source=SOURCE)
+        beliefs[element] = session.believe(statement, evidence=evidence, source=SOURCE, accumulate=observation)
     return beliefs
 
 
@@ -292,7 +287,7 @@ def read_request_elements(
             details={"reading": reading},
         )
     opinions = judged_elements(request, timeout=timeout)
-    believe_elements(session, opinions)
+    believe_elements(session, opinions, request)
     return opinions
 
 
