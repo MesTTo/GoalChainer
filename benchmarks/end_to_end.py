@@ -7,7 +7,10 @@ elements SNARS held and the seconds taken; per reading, agreement with the decis
 and the chosen action's mean expectation.
 
 Run from anywhere, with GOALCHAINER_SEMREWRITE naming the semrewrite command:
-    python3 benchmarks/end_to_end.py OUTPUT_DIR [--workers N] [--readings keywords,judged,labels]
+    python3 benchmarks/end_to_end.py OUTPUT_DIR [--workers N] [--readings keywords,judged,labels,protective]
+        [--requests held_out:15,held_out:17]
+The protective reading (benchmarks/protective_judge.py) differs from the judged one only on requests the keyword
+extractor finds sensitive data in and the judge does not, so it needs running only there.
 """
 
 # am[implements a-gcje-e2e]
@@ -125,6 +128,8 @@ def main() -> int:
     parser.add_argument("out", type=Path)
     parser.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 8) // 8))
     parser.add_argument("--readings", default="keywords,judged,labels")
+    parser.add_argument("--requests", help="only these requests, as split:index pairs separated by commas, such as "
+                        "held_out:15,held_out:17 for a reading that differs from another only there")
     args = parser.parse_args()
     environments = reading_environments()
     wanted = args.readings.split(",")
@@ -134,7 +139,9 @@ def main() -> int:
     args.out.mkdir(parents=True, exist_ok=True)
     requests = {split: json.loads(path.read_text())["requests"] for split, path in FIXTURES.items()}
     labels = {(split, i): r for split, rs in requests.items() for i, r in enumerate(rs)}
-    jobs = [(split, i, r["text"], reading) for split, rs in requests.items() for i, r in enumerate(rs) for reading in wanted]
+    chosen = None if args.requests is None else {(s, int(i)) for s, i in (pair.split(":") for pair in args.requests.split(","))}
+    jobs = [(split, i, r["text"], reading) for split, rs in requests.items() for i, r in enumerate(rs) for reading in wanted
+            if chosen is None or (split, i) in chosen]
     records = []
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
         futures = {pool.submit(run, job, args.out, environments[job[3]]): job for job in jobs}
