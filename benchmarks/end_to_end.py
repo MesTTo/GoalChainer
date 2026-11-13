@@ -130,7 +130,19 @@ def main() -> int:
     parser.add_argument("--readings", default="keywords,judged,labels")
     parser.add_argument("--requests", help="only these requests, as split:index pairs separated by commas, such as "
                         "held_out:15,held_out:17 for a reading that differs from another only there")
+    parser.add_argument("--collect", action="store_true",
+                        help="run nothing: tabulate every record kept in OUTPUT_DIR")
     args = parser.parse_args()
+    if args.collect:
+        requests = {split: json.loads(path.read_text())["requests"] for split, path in FIXTURES.items()}
+        labels = {(split, i): r for split, rs in requests.items() for i, r in enumerate(rs)}
+        records = sorted((json.loads(path.read_text()) for path in args.out.glob("*.json")
+                          if not path.name.endswith(".payload.json")),
+                         key=lambda r: (r["split"], r["index"], r["reading"]))
+        tables = tabulate(records, labels)
+        RESULTS.write_text(json.dumps({"tables": tables, "records": records}, indent=1) + "\n")
+        print(json.dumps(tables, indent=1))
+        return 0 if all(r["returncode"] == 0 for r in records) else 1
     environments = reading_environments()
     wanted = args.readings.split(",")
     missing = [r for r in wanted if r not in environments]
