@@ -100,8 +100,9 @@ def run(job: tuple[str, int, str, str], out: Path, environment: dict[str, str]) 
 
 # am[implements a-gcje-e2e]
 def tabulate(records: list[dict], labels: dict[tuple[str, int], dict]) -> dict:
-    """Per split and reading: runs that failed, decisions agreeing with the labels reading's, element accuracy of what
-    SNARS held, the chosen actions and their mean expectation, and the mean seconds a run took."""
+    """Per split and reading: runs that failed, decisions and every action's deontic status agreeing with the labels
+    reading's, element accuracy of what SNARS held, the chosen actions and their mean expectation, and the mean
+    seconds a run took."""
     out: dict = {}
     by = {(r["split"], r["index"], r["reading"]): r for r in records}
     for split in FIXTURES:
@@ -109,13 +110,17 @@ def tabulate(records: list[dict], labels: dict[tuple[str, int], dict]) -> dict:
             rows = [r for r in records if r["split"] == split and r["reading"] == reading]
             ok = [r for r in rows if r["returncode"] == 0]
             oracle = [by.get((split, r["index"], "labels")) for r in ok]
-            agree = sum(o is not None and o["returncode"] == 0 and o["chosen"] == r["chosen"] for r, o in zip(ok, oracle))
+            pairs = [(r, o) for r, o in zip(ok, oracle) if o is not None and o["returncode"] == 0]
+            agree = sum(o["chosen"] == r["chosen"] for r, o in pairs)
+            # The deontic status of every action, permitted, obligated or forbidden, as the labels reading derives it.
+            norms = sum(all(r["actions"][a]["norm"] == o["actions"][a]["norm"] for a in o["actions"]) for r, o in pairs)
             elements = {e: sum(r["held"][e] == labels[(split, r["index"])][e] for r in ok) for e in CONTEXT.values()}
             actions: dict[str, int] = {}
             for r in ok:
                 actions[r["chosen"]] = actions.get(r["chosen"], 0) + 1
             out.setdefault(split, {})[reading] = {
                 "runs": len(rows), "failed": len(rows) - len(ok), "agree_with_labels": agree,
+                "norms_agree_with_labels": norms,
                 "elements_right": elements, "chosen": actions,
                 "mean_expectation": round(sum(r["expectation"] for r in ok) / len(ok), 4) if ok else None,
                 "mean_seconds": round(sum(r["seconds"] for r in ok) / len(ok), 1) if ok else None,
