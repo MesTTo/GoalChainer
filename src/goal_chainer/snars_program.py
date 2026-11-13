@@ -1,7 +1,8 @@
-"""Typed construction of PeTTa programs for the GoalChainer SNARS adapter."""
+"""Purpose: typed construction of PeTTa programs for the GoalChainer SNARS adapter."""
 
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 import os
@@ -160,7 +161,7 @@ class SnarsProgramBuilder:
         parser_name: str = "alphabeta",
         lang: str = "en",
     ) -> ProgramFragments:
-        """Parse text with Mettabase and retain its real typed SH facts."""
+        """Parse text with Mettabase and retain its real typed SH facts, under edge ids of this ingestion's own."""
 
         if not text.strip():
             raise SnarsInvalidInputError("Text ingestion requires nonempty text.")
@@ -183,7 +184,11 @@ class SnarsProgramBuilder:
                 lang=lang,
                 direct_error=direct_error,
             )
-        return _split_ingestion_program(program, self.codec)
+        return _namespaced_edges(
+            _split_ingestion_program(program, self.codec),
+            _ingestion_namespace(text, source, trust, parser_name, lang),
+            self.codec,
+        )
 
     def batch(
         self,
@@ -429,6 +434,60 @@ def _split_ingestion_program(program: str, codec: SexprCodec) -> ProgramFragment
             _validate_generated_fact(source, codec)
             facts.append(source)
     return ProgramFragments(tuple(facts), tuple(effects))
+
+
+# am[addresses i-gc-store-one-request]
+def _ingestion_namespace(
+    text: str,
+    source: str,
+    trust: float,
+    parser_name: str,
+    lang: str,
+) -> str:
+    """A name for one ingestion's edges, fixed by what was ingested and how, so replaying a request names its edges
+    as before and two different requests name theirs apart."""
+
+    inputs = json.dumps([text, source, trust, parser_name, lang], ensure_ascii=False)
+    return hashlib.sha256(inputs.encode("utf-8")).hexdigest()[:16]
+
+
+# am[addresses i-gc-store-one-request]
+def _namespaced_edges(
+    fragments: ProgramFragments,
+    namespace: str,
+    codec: SexprCodec,
+) -> ProgramFragments:
+    """The ingestion with every HyperBase edge id it declares, by an (hb edge ID HEDGE) fact, renamed ID-namespace
+    wherever it appears. Mettabase numbers each program's edges hb1, hb2 and on afresh, so a store holding two
+    requests held two edges named hb1: an effect such as (sn ingest! hb1 ...) then matched both trees, the batch's
+    let* ran its operation once per combination of those answers, and the protocol parser rightly refused the four
+    records that came back.
+
+    Time: one parse, walk and emit of each fact and effect, linear in the program's size."""
+
+    facts = [codec.parse(fact) for fact in fragments.facts]
+    renamed = {
+        atom[2].text: codec.symbol(f"{atom[2].text}-{namespace}")
+        for atom in facts
+        if isinstance(atom, list)
+        and len(atom) >= 3
+        and all(isinstance(part, codec.Symbol) for part in atom[:3])
+        and (atom[0].text, atom[1].text) == ("hb", "edge")
+    }
+    if not renamed:
+        return fragments
+
+    def rename(atom: Any) -> Any:
+        if isinstance(atom, list):
+            return [rename(part) for part in atom]
+        if isinstance(atom, codec.Symbol):
+            return renamed.get(atom.text, atom)
+        return atom
+
+    return ProgramFragments(
+        tuple(codec.emit(rename(atom)) for atom in facts),
+        tuple(codec.emit(rename(codec.parse(effect))) for effect in fragments.effects),
+    )
 
 
 def _validate_generated_fact(source: str, codec: SexprCodec) -> None:

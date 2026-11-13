@@ -82,6 +82,21 @@ def test_persistent_native_replay_is_structurally_identical(tmp_path) -> None:
     assert first["state"]["event_count"] == second["state"]["event_count"]
 
 
+# am[verifies i-gc-store-one-request]
+def test_persistent_store_takes_a_second_different_request(tmp_path) -> None:
+    database = tmp_path / "two.sqlite3"
+
+    public = native_decision_payload(PUBLIC_REQUEST, store_path=database)
+    both = native_decision_payload(UNVERIFIED_REQUEST, store_path=database)
+
+    # The store keeps the first request's reading and adds the second's, as one incident told in two messages.
+    context = both["request_context"]
+    assert context["public"]["evidence"]["positive"] > 0
+    assert context["unverified"]["evidence"]["positive"] > 0
+    assert both["state"]["event_count"] > public["state"]["event_count"]
+    assert both["decisions"][0]["action_id"] == "hold_external_update"
+
+
 def test_native_solve_records_execution_outcome_and_trust_audit(tmp_path) -> None:
     report = solve_incident(
         PRIVATE_REQUEST,

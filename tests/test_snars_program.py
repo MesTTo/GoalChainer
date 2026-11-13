@@ -157,3 +157,34 @@ def test_text_ingestion_rejects_invalid_configured_parser_python(
             source="request",
             trust=1.0,
         )
+
+
+# am[verifies i-gc-store-one-request]
+def test_text_ingestion_names_each_ingestions_edges_apart(runtime, monkeypatch) -> None:
+    # Mettabase names every program's edges from hb1 afresh, so two requests' programs collide in one store.
+    program = (
+        '(hb edge hb1 (is/Pv.so logs/Cc public/Ca))\n'
+        '(hb edge hb1_1 logs/Cc)\n'
+        '(hb subedge hb1 hb1_1)\n'
+        '(hb tree hb1 (sh-atom (tag C c NoRoles ()) "public"))\n'
+        '!(sn ingest! hb1 "request" 1.0 1.0)'
+    )
+    monkeypatch.setattr(snars_program, "_text_program_in_process", lambda *args, **kwargs: program)
+    builder = SnarsProgramBuilder(runtime)
+
+    first, again, second = (
+        builder.text_ingestion(text, source="request", trust=1.0) for text in ("first", "first", "second")
+    )
+
+    def declared(fragments):
+        return {builder.codec.parse(fact)[2].text for fact in fragments.facts if fact.startswith("(hb edge ")}
+
+    assert first == again
+    assert len(declared(first)) == len(declared(second)) == 2
+    assert declared(first).isdisjoint(declared(second))
+    for fragments in (first, second):
+        text = " ".join((*fragments.facts, *fragments.effects))
+        root = next(name for name in declared(fragments) if name.startswith("hb1-"))
+        assert " hb1 " not in text and " hb1_1)" not in text
+        assert fragments.effects == (f'(sn ingest! {root} "request" 1.0 1.0)',)
+        assert f"(hb subedge {root} hb1_1-" in text
