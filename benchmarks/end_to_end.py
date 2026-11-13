@@ -44,6 +44,9 @@ def reading_environments() -> dict[str, dict[str, str]]:
     semrewrite = os.environ.get("GOALCHAINER_SEMREWRITE", "")
     if semrewrite.strip():
         environments["judged"] = {"GOALCHAINER_ELEMENTS": "judged", "GOALCHAINER_SEMREWRITE": semrewrite}
+        protective = shlex.join([sys.executable, str(ROOT / "benchmarks" / "protective_judge.py")])
+        environments["protective"] = {"GOALCHAINER_ELEMENTS": "judged", "GOALCHAINER_SEMREWRITE": protective,
+                                      "PROTECTIVE_SEMREWRITE": semrewrite}
     return environments
 
 
