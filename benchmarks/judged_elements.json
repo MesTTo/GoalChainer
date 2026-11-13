@@ -1,0 +1,4934 @@
+{
+ "judge": "nli-deberta-large",
+ "statement_sets": {
+  "deployed": {
+   "statements": {
+    "sensitive-data": [
+     "The data may include customer emails.",
+     "The data may include order IDs.",
+     "The data may include request payloads.",
+     "The data may include raw logs.",
+     "The data includes customer emails.",
+     "The data includes order IDs.",
+     "The data includes request payloads.",
+     "The data includes tokens or secrets.",
+     "The data includes raw logs.",
+     "The data includes customer information.",
+     "The data includes personally identifiable information.",
+     "The data includes credentials.",
+     "The data includes secrets.",
+     "The data includes identifiers.",
+     "The data includes API keys.",
+     "The data includes customer data.",
+     "The data includes sensitive data."
+    ],
+    "public-data": [
+     "The information is safe to share publicly.",
+     "There is no sensitive data.",
+     "There is no personal data.",
+     "There is no customer data.",
+     "Nothing sensitive is included.",
+     "There is no PII.",
+     "The data is not sensitive.",
+     "It is safe to publish.",
+     "It is public information.",
+     "It is non-sensitive."
+    ],
+    "unverified": [
+     "The cause of the problem is not yet known.",
+     "The facts are not yet confirmed.",
+     "The facts are unverified.",
+     "The facts are not ready.",
+     "They are still investigating.",
+     "They do not know yet.",
+     "The root cause is unknown.",
+     "There is no root cause yet."
+    ],
+    "coordination-needed": [
+     "Engineering and support need to coordinate.",
+     "Responders need to coordinate.",
+     "The team needs an incident channel.",
+     "The on-call engineers need to coordinate.",
+     "Engineering and support need to work together.",
+     "Responders need to share information with each other.",
+     "People need to coordinate."
+    ]
+   },
+   "base_rates": {
+    "sensitive-data": 0.4230769230769231,
+    "public-data": 0.19230769230769232,
+    "unverified": 0.19230769230769232,
+    "coordination-needed": 0.19230769230769232
+   },
+   "trust": 0.9463346091631756,
+   "ml_trust": 1.0,
+   "tuning": {
+    "requests": 26,
+    "keywords": {
+     "sensitive-data": {
+      "stating": 11,
+      "right": 21,
+      "false_alarms": 0,
+      "misses": 5
+     },
+     "public-data": {
+      "stating": 5,
+      "right": 22,
+      "false_alarms": 0,
+      "misses": 4
+     },
+     "unverified": {
+      "stating": 5,
+      "right": 23,
+      "false_alarms": 0,
+      "misses": 3
+     },
+     "coordination-needed": {
+      "stating": 5,
+      "right": 24,
+      "false_alarms": 2,
+      "misses": 0
+     }
+    },
+    "judged": {
+     "sensitive-data": {
+      "stating": 11,
+      "right": 26,
+      "false_alarms": 0,
+      "misses": 0,
+      "brier": 0.1124
+     },
+     "public-data": {
+      "stating": 5,
+      "right": 25,
+      "false_alarms": 0,
+      "misses": 1,
+      "brier": 0.0478
+     },
+     "unverified": {
+      "stating": 5,
+      "right": 26,
+      "false_alarms": 0,
+      "misses": 0,
+      "brier": 0.0323
+     },
+     "coordination-needed": {
+      "stating": 5,
+      "right": 25,
+      "false_alarms": 0,
+      "misses": 1,
+      "brier": 0.0646
+     }
+    },
+    "protective": {
+     "sensitive-data": {
+      "stating": 11,
+      "right": 26,
+      "false_alarms": 0,
+      "misses": 0
+     },
+     "public-data": {
+      "stating": 5,
+      "right": 25,
+      "false_alarms": 0,
+      "misses": 1
+     },
+     "unverified": {
+      "stating": 5,
+      "right": 26,
+      "false_alarms": 0,
+      "misses": 0
+     },
+     "coordination-needed": {
+      "stating": 5,
+      "right": 25,
+      "false_alarms": 0,
+      "misses": 1
+     }
+    },
+    "rows": [
+     {
+      "text": "Checkout is down. Engineering wants to paste raw logs into the incident room. Support says the logs may include customer emails, order IDs, and request payloads.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.965617,
+       "public-data": 0.197179,
+       "unverified": 0.229748,
+       "coordination-needed": 0.168101
+      },
+      "statements": {
+       "sensitive-data": "The data may include customer emails.",
+       "public-data": "It is public information.",
+       "unverified": "They are still investigating.",
+       "coordination-needed": "Engineering and support need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The outage is resolved. There is no sensitive data in this status, it is safe to share publicly with engineering and support.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.440017,
+       "public-data": 0.94995,
+       "unverified": 0.200002,
+       "coordination-needed": 0.203182
+      },
+      "statements": {
+       "sensitive-data": "The data includes request payloads.",
+       "public-data": "Nothing sensitive is included.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Engineering and support need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Checkout is down. Engineering wants to share raw logs with customer emails and order IDs, but the root cause is unknown and the facts are not ready.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.964313,
+       "public-data": 0.200243,
+       "unverified": 0.950866,
+       "coordination-needed": 0.227854
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is public information.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Responders need to share information with each other."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The dump we want to share reveals who our shoppers are and their home addresses.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.966409,
+       "public-data": 0.199567,
+       "unverified": 0.199862,
+       "coordination-needed": 0.252036
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is public information.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Engineering and support need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Checkout is down but the root cause is unknown and the facts are not ready.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.443935,
+       "public-data": 0.200009,
+       "unverified": 0.951224,
+       "coordination-needed": 0.200103
+      },
+      "statements": {
+       "sensitive-data": "The data includes customer information.",
+       "public-data": "There is no personal data.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Responders need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Do not publish the raw logs that expose customer emails.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.964575,
+       "public-data": 0.013753,
+       "unverified": 0.200171,
+       "coordination-needed": 0.200426
+      },
+      "statements": {
+       "sensitive-data": "The data includes customer emails.",
+       "public-data": "The data is not sensitive.",
+       "unverified": "The facts are unverified.",
+       "coordination-needed": "Responders need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The payment service failed overnight, and the stack traces show card numbers and billing addresses.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.965911,
+       "public-data": 0.200208,
+       "unverified": 0.212786,
+       "coordination-needed": 0.200669
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is public information.",
+       "unverified": "The facts are not ready.",
+       "coordination-needed": "People need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "We fixed the DNS issue. The summary holds nothing about any person and can go on the public status page.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.439993,
+       "public-data": 0.949895,
+       "unverified": 0.20255,
+       "coordination-needed": 0.201154
+      },
+      "statements": {
+       "sensitive-data": "The data may include order IDs.",
+       "public-data": "There is no personal data.",
+       "unverified": "The facts are not ready.",
+       "coordination-needed": "Responders need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Support and engineering both need to see the error counts to coordinate the response.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.440024,
+       "public-data": 0.199244,
+       "unverified": 0.202201,
+       "coordination-needed": 0.949537
+      },
+      "statements": {
+       "sensitive-data": "The data includes customer information.",
+       "public-data": "It is public information.",
+       "unverified": "The facts are not ready.",
+       "coordination-needed": "Responders need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "We still don't know why the database fell over.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.440026,
+       "public-data": 0.19994,
+       "unverified": 0.951433,
+       "coordination-needed": 0.200689
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "The data is not sensitive.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Responders need to share information with each other."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The incident report lists the affected users by their full names.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.965986,
+       "public-data": 0.202463,
+       "unverified": 0.199964,
+       "coordination-needed": 0.205176
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is public information.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Engineering and support need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Our API keys leaked into the build output we want to post.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.965842,
+       "public-data": 0.2003,
+       "unverified": 0.200019,
+       "coordination-needed": 0.246329
+      },
+      "statements": {
+       "sensitive-data": "The data includes API keys.",
+       "public-data": "It is public information.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "The on-call engineers need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Engineering, support and legal have to agree before anything goes out.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.440078,
+       "public-data": 0.197443,
+       "unverified": 0.20006,
+       "coordination-needed": 0.950441
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is public information.",
+       "unverified": "They are still investigating.",
+       "coordination-needed": "Engineering and support need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The latency graphs show only aggregate numbers, nothing about individual customers, so anyone may see them.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.440007,
+       "public-data": 0.950521,
+       "unverified": 0.202391,
+       "coordination-needed": 0.200324
+      },
+      "statements": {
+       "sensitive-data": "The data may include raw logs.",
+       "public-data": "There is no personal data.",
+       "unverified": "The facts are not ready.",
+       "coordination-needed": "Responders need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The investigation is ongoing and the impact has not been confirmed.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.440018,
+       "public-data": 0.200018,
+       "unverified": 0.951513,
+       "coordination-needed": 0.211997
+      },
+      "statements": {
+       "sensitive-data": "The data may include request payloads.",
+       "public-data": "There is no customer data.",
+       "unverified": "They are still investigating.",
+       "coordination-needed": "The on-call engineers need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The logs carry session tokens and user IDs.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.966346,
+       "public-data": 0.201378,
+       "unverified": 0.199947,
+       "coordination-needed": 0.200448
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is public information.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Responders need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The vendor confirmed the root cause: a misconfigured load balancer.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.440028,
+       "public-data": 0.200144,
+       "unverified": 0.02589,
+       "coordination-needed": 0.20017
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is safe to publish.",
+       "unverified": "They are still investigating.",
+       "coordination-needed": "Responders need to share information with each other."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Please post the redacted timeline; every personal detail has been removed.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.44108,
+       "public-data": 0.411382,
+       "unverified": 0.201549,
+       "coordination-needed": 0.201923
+      },
+      "statements": {
+       "sensitive-data": "The data includes sensitive data.",
+       "public-data": "Nothing sensitive is included.",
+       "unverified": "The facts are not ready.",
+       "coordination-needed": "Engineering and support need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Three teams are paging each other about the outage and need one place to talk.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.440424,
+       "public-data": 0.225532,
+       "unverified": 0.20034,
+       "coordination-needed": 0.949388
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is public information.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Responders need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The attachment has our customers' phone numbers.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.964226,
+       "public-data": 0.200632,
+       "unverified": 0.199956,
+       "coordination-needed": 0.216294
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is public information.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Engineering and support need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The status update only says the service is back up.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.440001,
+       "public-data": 0.722999,
+       "unverified": 0.215435,
+       "coordination-needed": 0.200474
+      },
+      "statements": {
+       "sensitive-data": "The data may include customer emails.",
+       "public-data": "Nothing sensitive is included.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Responders need to share information with each other."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The database export contains passwords in plain text.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.964749,
+       "public-data": 0.199998,
+       "unverified": 0.199996,
+       "coordination-needed": 0.201376
+      },
+      "statements": {
+       "sensitive-data": "The data includes secrets.",
+       "public-data": "It is public information.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Engineering and support need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "We are sure the outage came from yesterday's deploy.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.440033,
+       "public-data": 0.200029,
+       "unverified": 0.200011,
+       "coordination-needed": 0.200071
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is public information.",
+       "unverified": "They are still investigating.",
+       "coordination-needed": "Responders need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The on-call engineer and the support lead need a shared channel to work the incident together.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.440109,
+       "public-data": 0.195524,
+       "unverified": 0.200177,
+       "coordination-needed": 0.949745
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is safe to publish.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Engineering and support need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "We have no idea yet whether the crash was caused by the cache or the network.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.440032,
+       "public-data": 0.200022,
+       "unverified": 0.951106,
+       "coordination-needed": 0.200134
+      },
+      "statements": {
+       "sensitive-data": "The data may include request payloads.",
+       "public-data": "There is no customer data.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Responders need to share information with each other."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The screenshot shows a customer's medical record number.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.965999,
+       "public-data": 0.205032,
+       "unverified": 0.199507,
+       "coordination-needed": 0.321376
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is safe to publish.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Engineering and support need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     }
+    ]
+   },
+   "held_out": {
+    "requests": 42,
+    "keywords": {
+     "sensitive-data": {
+      "stating": 14,
+      "right": 33,
+      "false_alarms": 1,
+      "misses": 8
+     },
+     "public-data": {
+      "stating": 10,
+      "right": 34,
+      "false_alarms": 0,
+      "misses": 8
+     },
+     "unverified": {
+      "stating": 10,
+      "right": 34,
+      "false_alarms": 0,
+      "misses": 8
+     },
+     "coordination-needed": {
+      "stating": 10,
+      "right": 41,
+      "false_alarms": 1,
+      "misses": 0
+     }
+    },
+    "judged": {
+     "sensitive-data": {
+      "stating": 14,
+      "right": 39,
+      "false_alarms": 1,
+      "misses": 2,
+      "brier": 0.1382
+     },
+     "public-data": {
+      "stating": 10,
+      "right": 37,
+      "false_alarms": 1,
+      "misses": 4,
+      "brier": 0.1041
+     },
+     "unverified": {
+      "stating": 10,
+      "right": 41,
+      "false_alarms": 1,
+      "misses": 0,
+      "brier": 0.0458
+     },
+     "coordination-needed": {
+      "stating": 10,
+      "right": 36,
+      "false_alarms": 5,
+      "misses": 1,
+      "brier": 0.1171
+     }
+    },
+    "protective": {
+     "sensitive-data": {
+      "stating": 14,
+      "right": 39,
+      "false_alarms": 2,
+      "misses": 1
+     },
+     "public-data": {
+      "stating": 10,
+      "right": 37,
+      "false_alarms": 1,
+      "misses": 4
+     },
+     "unverified": {
+      "stating": 10,
+      "right": 41,
+      "false_alarms": 1,
+      "misses": 0
+     },
+     "coordination-needed": {
+      "stating": 10,
+      "right": 36,
+      "false_alarms": 5,
+      "misses": 1
+     }
+    },
+    "rows": [
+     {
+      "text": "Ops wants to put the full request bodies, which carry customers' street addresses, in the bug report.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.967771,
+       "public-data": 0.192386,
+       "unverified": 0.192675,
+       "coordination-needed": 0.192688
+      },
+      "statements": {
+       "sensitive-data": "The data includes request payloads.",
+       "public-data": "It is public information.",
+       "unverified": "They are still investigating.",
+       "coordination-needed": "Engineering and support need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The error budget dashboard shows totals per region only; it is fine for the whole internet to see it.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423129,
+       "public-data": 0.945733,
+       "unverified": 0.192247,
+       "coordination-needed": 0.192698
+      },
+      "statements": {
+       "sensitive-data": "The data includes customer information.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Engineering and support need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Nobody has worked out yet what triggered the memory leak.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423111,
+       "public-data": 0.192032,
+       "unverified": 0.955455,
+       "coordination-needed": 0.192589
+      },
+      "statements": {
+       "sensitive-data": "The data includes secrets.",
+       "public-data": "The data is not sensitive.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Responders need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The networking, storage and security teams must pool what they know in one thread to fix this.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.423161,
+       "public-data": 0.021905,
+       "unverified": 0.192303,
+       "coordination-needed": 0.951435
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is public information.",
+       "unverified": "They are still investigating.",
+       "coordination-needed": "People need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The crash dump includes a private SSH key.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.963935,
+       "public-data": 0.01418,
+       "unverified": 0.192355,
+       "coordination-needed": 0.197875
+      },
+      "statements": {
+       "sensitive-data": "The data includes secrets.",
+       "public-data": "There is no customer data.",
+       "unverified": "They are still investigating.",
+       "coordination-needed": "Engineering and support need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Login failures spiked this morning. The auth logs we want to circulate contain usernames and their IP addresses, and we have not yet confirmed whether it was an attack.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.968324,
+       "public-data": 0.192073,
+       "unverified": 0.953803,
+       "coordination-needed": 0.194331
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is public information.",
+       "unverified": "The facts are unverified.",
+       "coordination-needed": "Responders need to share information with each other."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Our engineers have confirmed the outage was caused by an expired TLS certificate.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.437403,
+       "public-data": 0.192341,
+       "unverified": 0.010726,
+       "coordination-needed": 0.192387
+      },
+      "statements": {
+       "sensitive-data": "The data includes credentials.",
+       "public-data": "It is public information.",
+       "unverified": "The facts are not ready.",
+       "coordination-needed": "The on-call engineers need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "This announcement mentions no customers and no internal systems, so it can go out on social media.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.543951,
+       "public-data": 0.944792,
+       "unverified": 0.193364,
+       "coordination-needed": 0.625743
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "Nothing sensitive is included.",
+       "unverified": "The facts are unverified.",
+       "coordination-needed": "The on-call engineers need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "Finance and the payments team need to look at the same reconciliation report together.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.423154,
+       "public-data": 0.188764,
+       "unverified": 0.192309,
+       "coordination-needed": 0.923345
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is public information.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "People need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The spreadsheet lists every subscriber's date of birth and home phone.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.967748,
+       "public-data": 0.192302,
+       "unverified": 0.192212,
+       "coordination-needed": 0.241396
+      },
+      "statements": {
+       "sensitive-data": "The data includes personally identifiable information.",
+       "public-data": "It is public information.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Engineering and support need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "We suspect the cache, but the cause is still unconfirmed.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.439587,
+       "public-data": 0.192303,
+       "unverified": 0.955151,
+       "coordination-needed": 0.192405
+      },
+      "statements": {
+       "sensitive-data": "The data includes secrets.",
+       "public-data": "There is no customer data.",
+       "unverified": "The root cause is unknown.",
+       "coordination-needed": "Responders need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Please share the anonymised error rates on the public status page.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423146,
+       "public-data": 0.196989,
+       "unverified": 0.925158,
+       "coordination-needed": 0.201036
+      },
+      "statements": {
+       "sensitive-data": "The data includes sensitive data.",
+       "public-data": "There is no personal data.",
+       "unverified": "The facts are unverified.",
+       "coordination-needed": "Responders need to share information with each other."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The webhook payloads we captured hold customers' bank account numbers.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.967975,
+       "public-data": 0.191919,
+       "unverified": 0.192232,
+       "coordination-needed": 0.221107
+      },
+      "statements": {
+       "sensitive-data": "The data includes customer information.",
+       "public-data": "It is safe to publish.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Engineering and support need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Customer support, the database administrators and the product owner should all join a bridge call to work through the outage.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.424762,
+       "public-data": 0.194266,
+       "unverified": 0.192327,
+       "coordination-needed": 0.952302
+      },
+      "statements": {
+       "sensitive-data": "The data includes customer data.",
+       "public-data": "It is public information.",
+       "unverified": "They are still investigating.",
+       "coordination-needed": "Responders need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "It is not clear yet how many users were affected.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.424135,
+       "public-data": 0.193672,
+       "unverified": 0.953612,
+       "coordination-needed": 0.192527
+      },
+      "statements": {
+       "sensitive-data": "The data includes customer information.",
+       "public-data": "There is no sensitive data.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "People need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The trace export has the OAuth bearer tokens of logged-in users.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.451257,
+       "public-data": 0.192649,
+       "unverified": 0.192116,
+       "coordination-needed": 0.199881
+      },
+      "statements": {
+       "sensitive-data": "The data includes tokens or secrets.",
+       "public-data": "It is public information.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Responders need to share information with each other."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The deploy was rolled back and the site is healthy again.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423129,
+       "public-data": 0.1937,
+       "unverified": 0.192309,
+       "coordination-needed": 0.192746
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is safe to publish.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "People need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The postmortem draft has had all names and email addresses stripped out and is ready to publish.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423126,
+       "public-data": 0.204868,
+       "unverified": 0.192273,
+       "coordination-needed": 0.194833
+      },
+      "statements": {
+       "sensitive-data": "The data includes sensitive data.",
+       "public-data": "There is no PII.",
+       "unverified": "The facts are unverified.",
+       "coordination-needed": "The on-call engineers need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Engineering and support keep giving customers different answers, so they need a single place to agree on the facts.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.42385,
+       "public-data": 0.191533,
+       "unverified": 0.193797,
+       "coordination-needed": 0.952667
+      },
+      "statements": {
+       "sensitive-data": "The data includes customer information.",
+       "public-data": "Nothing sensitive is included.",
+       "unverified": "The facts are unverified.",
+       "coordination-needed": "Responders need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The CSV we were asked to send contains patients' diagnoses.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.964637,
+       "public-data": 0.192187,
+       "unverified": 0.190941,
+       "coordination-needed": 0.278939
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is safe to publish.",
+       "unverified": "The facts are unverified.",
+       "coordination-needed": "Engineering and support need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "We have a theory about the disk failure, but we can't confirm it until the vendor replies.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423117,
+       "public-data": 0.19216,
+       "unverified": 0.954397,
+       "coordination-needed": 0.194351
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "There is no personal data.",
+       "unverified": "The facts are unverified.",
+       "coordination-needed": "Responders need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Mobile, web and backend teams all have to sign off on the fix together.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.423127,
+       "public-data": 0.190952,
+       "unverified": 0.192336,
+       "coordination-needed": 0.952921
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is public information.",
+       "unverified": "They are still investigating.",
+       "coordination-needed": "People need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The database snapshot that someone posted contains every user's hashed password and email address.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.967822,
+       "public-data": 0.192836,
+       "unverified": 0.192329,
+       "coordination-needed": 0.196193
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is public information.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Engineering and support need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The incident summary is generic and contains nothing confidential, so anyone can read it.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423064,
+       "public-data": 0.954903,
+       "unverified": 0.192886,
+       "coordination-needed": 0.201319
+      },
+      "statements": {
+       "sensitive-data": "The data includes raw logs.",
+       "public-data": "Nothing sensitive is included.",
+       "unverified": "The facts are not ready.",
+       "coordination-needed": "Engineering and support need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The leaked environment file contains our cloud provider's secret access key, and we still don't know how it got out.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.967958,
+       "public-data": 0.011163,
+       "unverified": 0.955074,
+       "coordination-needed": 0.224451
+      },
+      "statements": {
+       "sensitive-data": "The data includes secrets.",
+       "public-data": "There is no customer data.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Responders need to share information with each other."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The outage affected only internal test accounts, and the timeline has been verified.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423235,
+       "public-data": 0.194323,
+       "unverified": 0.192309,
+       "coordination-needed": 0.193078
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "There is no customer data.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Responders need to share information with each other."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Several on-call engineers across three time zones need a common channel to hand off the incident.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.423183,
+       "public-data": 0.188074,
+       "unverified": 0.194216,
+       "coordination-needed": 0.953702
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Responders need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The screenshot attached to the ticket shows a customer's full credit card number.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.967873,
+       "public-data": 0.192371,
+       "unverified": 0.192229,
+       "coordination-needed": 0.562037
+      },
+      "statements": {
+       "sensitive-data": "The data includes customer information.",
+       "public-data": "It is public information.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Engineering and support need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The charts in this report are already published on our public website.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423406,
+       "public-data": 0.208572,
+       "unverified": 0.095942,
+       "coordination-needed": 0.931374
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is public information.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Engineering and support need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "Initial reports say the outage started in Europe, but this has not been verified.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.4234,
+       "public-data": 0.382872,
+       "unverified": 0.954831,
+       "coordination-needed": 0.21001
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is public information.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "The on-call engineers need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "We want to paste the server logs, which include customers' names and shipping addresses, into the shared incident document so that support and engineering can work from the same evidence.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.967884,
+       "public-data": 0.19275,
+       "unverified": 0.193463,
+       "coordination-needed": 0.893144
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is public information.",
+       "unverified": "They are still investigating.",
+       "coordination-needed": "Engineering and support need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "Do not share this file outside the company: it holds employee salary records.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423403,
+       "public-data": 0.192347,
+       "unverified": 0.1925,
+       "coordination-needed": 0.195177
+      },
+      "statements": {
+       "sensitive-data": "The data includes sensitive data.",
+       "public-data": "There is no personal data.",
+       "unverified": "The facts are not ready.",
+       "coordination-needed": "Engineering and support need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The root cause is known: a bad configuration push, which we reverted.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423241,
+       "public-data": 0.19239,
+       "unverified": 0.010501,
+       "coordination-needed": 0.364085
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is public information.",
+       "unverified": "The facts are not ready.",
+       "coordination-needed": "The on-call engineers need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The metrics export holds only counts of requests per minute, with no user data, so it is safe to publish.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.422871,
+       "public-data": 0.954542,
+       "unverified": 0.192319,
+       "coordination-needed": 0.193404
+      },
+      "statements": {
+       "sensitive-data": "The data may include raw logs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "People need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Legal, communications and the security team must coordinate before we say anything about the outage.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.423134,
+       "public-data": 0.192431,
+       "unverified": 0.192439,
+       "coordination-needed": 0.954921
+      },
+      "statements": {
+       "sensitive-data": "The data includes customer information.",
+       "public-data": "It is public information.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "People need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The audit log records which employee viewed each customer's account, by employee ID and customer ID.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.967795,
+       "public-data": 0.192314,
+       "unverified": 0.192305,
+       "coordination-needed": 0.778636
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is safe to publish.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Engineering and support need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "We are still investigating whether any data was exposed.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423105,
+       "public-data": 0.181038,
+       "unverified": 0.954432,
+       "coordination-needed": 0.193341
+      },
+      "statements": {
+       "sensitive-data": "The data includes sensitive data.",
+       "public-data": "It is public information.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Engineering and support need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The error message we want to tweet says only that checkout is temporarily unavailable.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423328,
+       "public-data": 0.198502,
+       "unverified": 0.193737,
+       "coordination-needed": 0.197373
+      },
+      "statements": {
+       "sensitive-data": "The data includes customer information.",
+       "public-data": "There is no personal data.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Responders need to share information with each other."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The heap dump might contain session cookies, and we have not yet determined what caused the crash.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.963412,
+       "public-data": 0.191768,
+       "unverified": 0.955559,
+       "coordination-needed": 0.192424
+      },
+      "statements": {
+       "sensitive-data": "The data includes identifiers.",
+       "public-data": "It is public information.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "People need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The status page update was approved by the communications team and contains no personal information.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.423068,
+       "public-data": 0.955126,
+       "unverified": 0.192382,
+       "coordination-needed": 0.921406
+      },
+      "statements": {
+       "sensitive-data": "The data may include customer emails.",
+       "public-data": "Nothing sensitive is included.",
+       "unverified": "The facts are not ready.",
+       "coordination-needed": "Engineering and support need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The sanitized timeline holds nothing sensitive, so support and engineering can both work from it in the incident channel.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.423088,
+       "public-data": 0.954338,
+       "unverified": 0.192819,
+       "coordination-needed": 0.1971
+      },
+      "statements": {
+       "sensitive-data": "The data may include raw logs.",
+       "public-data": "Nothing sensitive is included.",
+       "unverified": "The facts are unverified.",
+       "coordination-needed": "The team needs an incident channel."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Support and engineering need to work through the outage together, but the cause has not been confirmed yet.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.423097,
+       "public-data": 0.820142,
+       "unverified": 0.955676,
+       "coordination-needed": 0.954889
+      },
+      "statements": {
+       "sensitive-data": "The data includes customer information.",
+       "public-data": "There is no personal data.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Engineering and support need to coordinate."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": true,
+       "coordination-needed": true
+      }
+     }
+    ]
+   }
+  },
+  "first": {
+   "statements": {
+    "sensitive-data": [
+     "The data may include customer emails.",
+     "The data may include order IDs.",
+     "The data may include request payloads.",
+     "The data may include tokens or secrets.",
+     "The data may include full traces.",
+     "The data may include raw logs.",
+     "The text mentions private information about people."
+    ],
+    "public-data": [
+     "The information is safe to share publicly."
+    ],
+    "unverified": [
+     "The cause of the problem is not yet known.",
+     "The facts are not yet confirmed."
+    ],
+    "coordination-needed": [
+     "Several teams need to work together."
+    ]
+   },
+   "base_rates": {
+    "sensitive-data": 0.4230769230769231,
+    "public-data": 0.19230769230769232,
+    "unverified": 0.19230769230769232,
+    "coordination-needed": 0.19230769230769232
+   },
+   "trust": 0.7396367687568156,
+   "ml_trust": 0.7786535611510843,
+   "tuning": {
+    "requests": 26,
+    "keywords": {
+     "sensitive-data": {
+      "stating": 11,
+      "right": 21,
+      "false_alarms": 0,
+      "misses": 5
+     },
+     "public-data": {
+      "stating": 5,
+      "right": 22,
+      "false_alarms": 0,
+      "misses": 4
+     },
+     "unverified": {
+      "stating": 5,
+      "right": 23,
+      "false_alarms": 0,
+      "misses": 3
+     },
+     "coordination-needed": {
+      "stating": 5,
+      "right": 24,
+      "false_alarms": 2,
+      "misses": 0
+     }
+    },
+    "judged": {
+     "sensitive-data": {
+      "stating": 11,
+      "right": 20,
+      "false_alarms": 1,
+      "misses": 5,
+      "brier": 0.2081
+     },
+     "public-data": {
+      "stating": 5,
+      "right": 22,
+      "false_alarms": 0,
+      "misses": 4,
+      "brier": 0.1303
+     },
+     "unverified": {
+      "stating": 5,
+      "right": 26,
+      "false_alarms": 0,
+      "misses": 0,
+      "brier": 0.0404
+     },
+     "coordination-needed": {
+      "stating": 5,
+      "right": 22,
+      "false_alarms": 3,
+      "misses": 1,
+      "brier": 0.1467
+     }
+    },
+    "protective": {
+     "sensitive-data": {
+      "stating": 11,
+      "right": 23,
+      "false_alarms": 1,
+      "misses": 2
+     },
+     "public-data": {
+      "stating": 5,
+      "right": 22,
+      "false_alarms": 0,
+      "misses": 4
+     },
+     "unverified": {
+      "stating": 5,
+      "right": 26,
+      "false_alarms": 0,
+      "misses": 0
+     },
+     "coordination-needed": {
+      "stating": 5,
+      "right": 22,
+      "false_alarms": 3,
+      "misses": 1
+     }
+    },
+    "rows": [
+     {
+      "text": "Checkout is down. Engineering wants to paste raw logs into the incident room. Support says the logs may include customer emails, order IDs, and request payloads.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.828722,
+       "public-data": 0.057328,
+       "unverified": 0.202186,
+       "coordination-needed": 0.754295
+      },
+      "statements": {
+       "sensitive-data": "The data may include customer emails.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The outage is resolved. There is no sensitive data in this status, it is safe to share publicly with engineering and support.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.440002,
+       "public-data": 0.744561,
+       "unverified": 0.200001,
+       "coordination-needed": 0.201501
+      },
+      "statements": {
+       "sensitive-data": "The data may include raw logs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Checkout is down. Engineering wants to share raw logs with customer emails and order IDs, but the root cause is unknown and the facts are not ready.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.829128,
+       "public-data": 0.180323,
+       "unverified": 0.762675,
+       "coordination-needed": 0.226934
+      },
+      "statements": {
+       "sensitive-data": "The data may include raw logs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The dump we want to share reveals who our shoppers are and their home addresses.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.838152,
+       "public-data": 0.198171,
+       "unverified": 0.199893,
+       "coordination-needed": 0.201079
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Checkout is down but the root cause is unknown and the facts are not ready.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.440012,
+       "public-data": 0.05596,
+       "unverified": 0.764516,
+       "coordination-needed": 0.200016
+      },
+      "statements": {
+       "sensitive-data": "The data may include order IDs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Do not publish the raw logs that expose customer emails.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.834834,
+       "public-data": 0.054346,
+       "unverified": 0.200045,
+       "coordination-needed": 0.200106
+      },
+      "statements": {
+       "sensitive-data": "The data may include raw logs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The payment service failed overnight, and the stack traces show card numbers and billing addresses.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.400283,
+       "public-data": 0.198887,
+       "unverified": 0.200026,
+       "coordination-needed": 0.200836
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "We fixed the DNS issue. The summary holds nothing about any person and can go on the public status page.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.439995,
+       "public-data": 0.160238,
+       "unverified": 0.201467,
+       "coordination-needed": 0.200044
+      },
+      "statements": {
+       "sensitive-data": "The data may include order IDs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Support and engineering both need to see the error counts to coordinate the response.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.440009,
+       "public-data": 0.191541,
+       "unverified": 0.198507,
+       "coordination-needed": 0.765925
+      },
+      "statements": {
+       "sensitive-data": "The data may include raw logs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "We still don't know why the database fell over.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.440008,
+       "public-data": 0.056023,
+       "unverified": 0.764689,
+       "coordination-needed": 0.200036
+      },
+      "statements": {
+       "sensitive-data": "The data may include order IDs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The incident report lists the affected users by their full names.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.854339,
+       "public-data": 0.199102,
+       "unverified": 0.199971,
+       "coordination-needed": 0.734115
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "Our API keys leaked into the build output we want to post.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.400007,
+       "public-data": 0.056034,
+       "unverified": 0.200015,
+       "coordination-needed": 0.42598
+      },
+      "statements": {
+       "sensitive-data": "The data may include full traces.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Engineering, support and legal have to agree before anything goes out.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.440017,
+       "public-data": 0.058141,
+       "unverified": 0.200029,
+       "coordination-needed": 0.765223
+      },
+      "statements": {
+       "sensitive-data": "The data may include full traces.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The latency graphs show only aggregate numbers, nothing about individual customers, so anyone may see them.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.440005,
+       "public-data": 0.160182,
+       "unverified": 0.200016,
+       "coordination-needed": 0.213348
+      },
+      "statements": {
+       "sensitive-data": "The data may include raw logs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The investigation is ongoing and the impact has not been confirmed.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.459557,
+       "public-data": 0.058762,
+       "unverified": 0.762699,
+       "coordination-needed": 0.200218
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The logs carry session tokens and user IDs.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.400017,
+       "public-data": 0.197394,
+       "unverified": 0.199959,
+       "coordination-needed": 0.201037
+      },
+      "statements": {
+       "sensitive-data": "The data may include full traces.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The vendor confirmed the root cause: a misconfigured load balancer.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.440013,
+       "public-data": 0.200012,
+       "unverified": 0.053282,
+       "coordination-needed": 0.200042
+      },
+      "statements": {
+       "sensitive-data": "The data may include order IDs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Please post the redacted timeline; every personal detail has been removed.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.87009,
+       "public-data": 0.160205,
+       "unverified": 0.199925,
+       "coordination-needed": 0.20171
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Three teams are paging each other about the outage and need one place to talk.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.440013,
+       "public-data": 0.193046,
+       "unverified": 0.200262,
+       "coordination-needed": 0.765033
+      },
+      "statements": {
+       "sensitive-data": "The data may include raw logs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The attachment has our customers' phone numbers.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.419792,
+       "public-data": 0.199577,
+       "unverified": 0.199963,
+       "coordination-needed": 0.802693
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The status update only says the service is back up.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.440001,
+       "public-data": 0.160054,
+       "unverified": 0.212004,
+       "coordination-needed": 0.260542
+      },
+      "statements": {
+       "sensitive-data": "The data may include customer emails.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The database export contains passwords in plain text.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.401432,
+       "public-data": 0.192378,
+       "unverified": 0.199997,
+       "coordination-needed": 0.487001
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "We are sure the outage came from yesterday's deploy.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.440019,
+       "public-data": 0.200006,
+       "unverified": 0.053335,
+       "coordination-needed": 0.200042
+      },
+      "statements": {
+       "sensitive-data": "The data may include request payloads.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The on-call engineer and the support lead need a shared channel to work the incident together.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.440023,
+       "public-data": 0.054545,
+       "unverified": 0.200138,
+       "coordination-needed": 0.209095
+      },
+      "statements": {
+       "sensitive-data": "The data may include request payloads.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "We have no idea yet whether the crash was caused by the cache or the network.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.440025,
+       "public-data": 0.139083,
+       "unverified": 0.765914,
+       "coordination-needed": 0.200038
+      },
+      "statements": {
+       "sensitive-data": "The data may include request payloads.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The screenshot shows a customer's medical record number.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.863404,
+       "public-data": 0.190458,
+       "unverified": 0.199588,
+       "coordination-needed": 0.821151
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     }
+    ]
+   },
+   "held_out": {
+    "requests": 42,
+    "keywords": {
+     "sensitive-data": {
+      "stating": 14,
+      "right": 33,
+      "false_alarms": 1,
+      "misses": 8
+     },
+     "public-data": {
+      "stating": 10,
+      "right": 34,
+      "false_alarms": 0,
+      "misses": 8
+     },
+     "unverified": {
+      "stating": 10,
+      "right": 34,
+      "false_alarms": 0,
+      "misses": 8
+     },
+     "coordination-needed": {
+      "stating": 10,
+      "right": 41,
+      "false_alarms": 1,
+      "misses": 0
+     }
+    },
+    "judged": {
+     "sensitive-data": {
+      "stating": 14,
+      "right": 35,
+      "false_alarms": 2,
+      "misses": 5,
+      "brier": 0.1874
+     },
+     "public-data": {
+      "stating": 10,
+      "right": 35,
+      "false_alarms": 0,
+      "misses": 7,
+      "brier": 0.128
+     },
+     "unverified": {
+      "stating": 10,
+      "right": 42,
+      "false_alarms": 0,
+      "misses": 0,
+      "brier": 0.0362
+     },
+     "coordination-needed": {
+      "stating": 10,
+      "right": 28,
+      "false_alarms": 12,
+      "misses": 2,
+      "brier": 0.2178
+     }
+    },
+    "protective": {
+     "sensitive-data": {
+      "stating": 14,
+      "right": 37,
+      "false_alarms": 2,
+      "misses": 3
+     },
+     "public-data": {
+      "stating": 10,
+      "right": 35,
+      "false_alarms": 0,
+      "misses": 7
+     },
+     "unverified": {
+      "stating": 10,
+      "right": 42,
+      "false_alarms": 0,
+      "misses": 0
+     },
+     "coordination-needed": {
+      "stating": 10,
+      "right": 28,
+      "false_alarms": 12,
+      "misses": 2
+     }
+    },
+    "rows": [
+     {
+      "text": "Ops wants to put the full request bodies, which carry customers' street addresses, in the bug report.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.836702,
+       "public-data": 0.189385,
+       "unverified": 0.192358,
+       "coordination-needed": 0.207362
+      },
+      "statements": {
+       "sensitive-data": "The data may include request payloads.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The error budget dashboard shows totals per region only; it is fine for the whole internet to see it.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423084,
+       "public-data": 0.78117,
+       "unverified": 0.19226,
+       "coordination-needed": 0.227202
+      },
+      "statements": {
+       "sensitive-data": "The data may include customer emails.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Nobody has worked out yet what triggered the memory leak.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423093,
+       "public-data": 0.050191,
+       "unverified": 0.788769,
+       "coordination-needed": 0.19234
+      },
+      "statements": {
+       "sensitive-data": "The data may include request payloads.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The networking, storage and security teams must pool what they know in one thread to fix this.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.4231,
+       "public-data": 0.050174,
+       "unverified": 0.192125,
+       "coordination-needed": 0.788054
+      },
+      "statements": {
+       "sensitive-data": "The data may include full traces.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The crash dump includes a private SSH key.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423087,
+       "public-data": 0.050087,
+       "unverified": 0.19232,
+       "coordination-needed": 0.741397
+      },
+      "statements": {
+       "sensitive-data": "The data may include full traces.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "Login failures spiked this morning. The auth logs we want to circulate contain usernames and their IP addresses, and we have not yet confirmed whether it was an attack.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.522361,
+       "public-data": 0.190118,
+       "unverified": 0.78459,
+       "coordination-needed": 0.192358
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Our engineers have confirmed the outage was caused by an expired TLS certificate.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423092,
+       "public-data": 0.192321,
+       "unverified": 0.050081,
+       "coordination-needed": 0.202395
+      },
+      "statements": {
+       "sensitive-data": "The data may include customer emails.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "This announcement mentions no customers and no internal systems, so it can go out on social media.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423055,
+       "public-data": 0.192708,
+       "unverified": 0.192715,
+       "coordination-needed": 0.736026
+      },
+      "statements": {
+       "sensitive-data": "The data may include raw logs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "Finance and the payments team need to look at the same reconciliation report together.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.423145,
+       "public-data": 0.187585,
+       "unverified": 0.192309,
+       "coordination-needed": 0.786143
+      },
+      "statements": {
+       "sensitive-data": "The data may include full traces.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The spreadsheet lists every subscriber's date of birth and home phone.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.845677,
+       "public-data": 0.19086,
+       "unverified": 0.192233,
+       "coordination-needed": 0.762734
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "We suspect the cache, but the cause is still unconfirmed.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423189,
+       "public-data": 0.050094,
+       "unverified": 0.787645,
+       "coordination-needed": 0.192332
+      },
+      "statements": {
+       "sensitive-data": "The data may include tokens or secrets.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Please share the anonymised error rates on the public status page.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.8474,
+       "public-data": 0.192434,
+       "unverified": 0.193836,
+       "coordination-needed": 0.200162
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The webhook payloads we captured hold customers' bank account numbers.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.846815,
+       "public-data": 0.185536,
+       "unverified": 0.192248,
+       "coordination-needed": 0.744464
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "Customer support, the database administrators and the product owner should all join a bridge call to work through the outage.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.423092,
+       "public-data": 0.192174,
+       "unverified": 0.192322,
+       "coordination-needed": 0.786999
+      },
+      "statements": {
+       "sensitive-data": "The data may include order IDs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "It is not clear yet how many users were affected.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423084,
+       "public-data": 0.051897,
+       "unverified": 0.787328,
+       "coordination-needed": 0.203711
+      },
+      "statements": {
+       "sensitive-data": "The data may include order IDs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The trace export has the OAuth bearer tokens of logged-in users.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.429911,
+       "public-data": 0.191534,
+       "unverified": 0.192158,
+       "coordination-needed": 0.194319
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The deploy was rolled back and the site is healthy again.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423089,
+       "public-data": 0.192389,
+       "unverified": 0.192308,
+       "coordination-needed": 0.19246
+      },
+      "statements": {
+       "sensitive-data": "The data may include customer emails.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The postmortem draft has had all names and email addresses stripped out and is ready to publish.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.581644,
+       "public-data": 0.182308,
+       "unverified": 0.192181,
+       "coordination-needed": 0.399067
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Engineering and support keep giving customers different answers, so they need a single place to agree on the facts.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.423089,
+       "public-data": 0.051339,
+       "unverified": 0.193019,
+       "coordination-needed": 0.786064
+      },
+      "statements": {
+       "sensitive-data": "The data may include order IDs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The CSV we were asked to send contains patients' diagnoses.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.848775,
+       "public-data": 0.166599,
+       "unverified": 0.114501,
+       "coordination-needed": 0.744769
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "We have a theory about the disk failure, but we can't confirm it until the vendor replies.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423088,
+       "public-data": 0.191137,
+       "unverified": 0.787874,
+       "coordination-needed": 0.200118
+      },
+      "statements": {
+       "sensitive-data": "The data may include raw logs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Mobile, web and backend teams all have to sign off on the fix together.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.423089,
+       "public-data": 0.052147,
+       "unverified": 0.192233,
+       "coordination-needed": 0.788185
+      },
+      "statements": {
+       "sensitive-data": "The data may include customer emails.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The database snapshot that someone posted contains every user's hashed password and email address.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.848841,
+       "public-data": 0.192136,
+       "unverified": 0.192324,
+       "coordination-needed": 0.763696
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The incident summary is generic and contains nothing confidential, so anyone can read it.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423066,
+       "public-data": 0.783459,
+       "unverified": 0.192324,
+       "coordination-needed": 0.194284
+      },
+      "statements": {
+       "sensitive-data": "The data may include raw logs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The leaked environment file contains our cloud provider's secret access key, and we still don't know how it got out.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423082,
+       "public-data": 0.050077,
+       "unverified": 0.788471,
+       "coordination-needed": 0.200853
+      },
+      "statements": {
+       "sensitive-data": "The data may include raw logs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The outage affected only internal test accounts, and the timeline has been verified.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.451651,
+       "public-data": 0.192313,
+       "unverified": 0.192308,
+       "coordination-needed": 0.197613
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Several on-call engineers across three time zones need a common channel to hand off the incident.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.423096,
+       "public-data": 0.188999,
+       "unverified": 0.193799,
+       "coordination-needed": 0.773666
+      },
+      "statements": {
+       "sensitive-data": "The data may include full traces.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The screenshot attached to the ticket shows a customer's full credit card number.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.844757,
+       "public-data": 0.189573,
+       "unverified": 0.192246,
+       "coordination-needed": 0.777282
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The charts in this report are already published on our public website.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423088,
+       "public-data": 0.192329,
+       "unverified": 0.11699,
+       "coordination-needed": 0.767116
+      },
+      "statements": {
+       "sensitive-data": "The data may include request payloads.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "Initial reports say the outage started in Europe, but this has not been verified.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423096,
+       "public-data": 0.050303,
+       "unverified": 0.788281,
+       "coordination-needed": 0.19553
+      },
+      "statements": {
+       "sensitive-data": "The data may include request payloads.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "We want to paste the server logs, which include customers' names and shipping addresses, into the shared incident document so that support and engineering can work from the same evidence.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.706232,
+       "public-data": 0.1923,
+       "unverified": 0.192245,
+       "coordination-needed": 0.761833
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "Do not share this file outside the company: it holds employee salary records.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.846285,
+       "public-data": 0.050079,
+       "unverified": 0.192326,
+       "coordination-needed": 0.192941
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The root cause is known: a bad configuration push, which we reverted.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.4231,
+       "public-data": 0.192316,
+       "unverified": 0.050079,
+       "coordination-needed": 0.668463
+      },
+      "statements": {
+       "sensitive-data": "The data may include order IDs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The metrics export holds only counts of requests per minute, with no user data, so it is safe to publish.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.422987,
+       "public-data": 0.788055,
+       "unverified": 0.192317,
+       "coordination-needed": 0.197063
+      },
+      "statements": {
+       "sensitive-data": "The data may include tokens or secrets.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Legal, communications and the security team must coordinate before we say anything about the outage.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.423102,
+       "public-data": 0.050155,
+       "unverified": 0.192411,
+       "coordination-needed": 0.788334
+      },
+      "statements": {
+       "sensitive-data": "The data may include customer emails.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The audit log records which employee viewed each customer's account, by employee ID and customer ID.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.42318,
+       "public-data": 0.191977,
+       "unverified": 0.192305,
+       "coordination-needed": 0.690124
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "We are still investigating whether any data was exposed.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423096,
+       "public-data": 0.050109,
+       "unverified": 0.787969,
+       "coordination-needed": 0.193047
+      },
+      "statements": {
+       "sensitive-data": "The data may include full traces.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The error message we want to tweet says only that checkout is temporarily unavailable.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.423054,
+       "public-data": 0.192274,
+       "unverified": 0.193424,
+       "coordination-needed": 0.762066
+      },
+      "statements": {
+       "sensitive-data": "The data may include customer emails.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The facts are not yet confirmed.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The heap dump might contain session cookies, and we have not yet determined what caused the crash.",
+      "labels": {
+       "sensitive-data": true,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "judged": {
+       "sensitive-data": 0.42499,
+       "public-data": 0.053294,
+       "unverified": 0.78885,
+       "coordination-needed": 0.192349
+      },
+      "statements": {
+       "sensitive-data": "The text mentions private information about people.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "The status page update was approved by the communications team and contains no personal information.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": false
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.42307,
+       "public-data": 0.197098,
+       "unverified": 0.192283,
+       "coordination-needed": 0.750265
+      },
+      "statements": {
+       "sensitive-data": "The data may include customer emails.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      }
+     },
+     {
+      "text": "The sanitized timeline holds nothing sensitive, so support and engineering can both work from it in the incident channel.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": true,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.423086,
+       "public-data": 0.205501,
+       "unverified": 0.192274,
+       "coordination-needed": 0.194689
+      },
+      "statements": {
+       "sensitive-data": "The data may include raw logs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": false
+      }
+     },
+     {
+      "text": "Support and engineering need to work through the outage together, but the cause has not been confirmed yet.",
+      "labels": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": true
+      },
+      "keywords": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": false,
+       "coordination-needed": true
+      },
+      "judged": {
+       "sensitive-data": 0.423088,
+       "public-data": 0.050398,
+       "unverified": 0.788942,
+       "coordination-needed": 0.233429
+      },
+      "statements": {
+       "sensitive-data": "The data may include raw logs.",
+       "public-data": "The information is safe to share publicly.",
+       "unverified": "The cause of the problem is not yet known.",
+       "coordination-needed": "Several teams need to work together."
+      },
+      "protective": {
+       "sensitive-data": false,
+       "public-data": false,
+       "unverified": true,
+       "coordination-needed": false
+      }
+     }
+    ]
+   }
+  }
+ }
+}
