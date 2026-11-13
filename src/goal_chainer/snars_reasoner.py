@@ -1,4 +1,4 @@
-"""High-level sessions over the native Mettabase SNARS world."""
+"""Purpose: high-level sessions over the native Mettabase SNARS world."""
 
 from __future__ import annotations
 
@@ -153,14 +153,19 @@ class SnarsActionReasoner:
 
 
 class SnarsSession:
-    """Replayable SNARS state without a long-running daemon."""
+    """Replayable SNARS state without a long-running daemon.
 
+    With `assert_request_context` false the GoalChainer policy still runs but no longer believes the request's
+    elements from its parsed labels, for a caller that believes them itself, as judged elements do."""
+
+    # am[implements a-gcje-believe]
     def __init__(
         self,
         runtime: SnarsRuntime,
         store: SnarsEventStore,
         *,
         include_goalchainer_policy: bool = True,
+        assert_request_context: bool = True,
     ) -> None:
         if store.mettabase_commit != runtime.diagnostics.mettabase_commit:
             raise SnarsPersistenceError(
@@ -174,15 +179,22 @@ class SnarsSession:
         self.store = store
         self.builder = SnarsProgramBuilder(runtime)
         self.include_goalchainer_policy = include_goalchainer_policy
+        self.assert_request_context = assert_request_context
         self._last_ingestion_payload: dict[str, Any] | None = None
 
     @classmethod
-    def ephemeral(cls, runtime: SnarsRuntime) -> SnarsSession:
+    def ephemeral(
+        cls,
+        runtime: SnarsRuntime,
+        *,
+        assert_request_context: bool = True,
+    ) -> SnarsSession:
         return cls(
             runtime,
             SnarsEventStore.memory(
                 mettabase_commit=runtime.diagnostics.mettabase_commit
             ),
+            assert_request_context=assert_request_context,
         )
 
     @classmethod
@@ -192,6 +204,7 @@ class SnarsSession:
         path: str | Path,
         *,
         redactor: Redactor | None = None,
+        assert_request_context: bool = True,
     ) -> SnarsSession:
         return cls(
             runtime,
@@ -200,6 +213,7 @@ class SnarsSession:
                 mettabase_commit=runtime.diagnostics.mettabase_commit,
                 redactor=redactor,
             ),
+            assert_request_context=assert_request_context,
         )
 
     def ingest_text(
@@ -262,6 +276,7 @@ class SnarsSession:
             "event_count": len(self.store.events()),
         }
 
+    # am[implements a-gcje-believe]
     def believe(
         self,
         statement: str,
@@ -272,6 +287,9 @@ class SnarsSession:
         occurrence: float | None = None,
         proof_depth: int = DEFAULT_PROOF_DEPTH,
     ) -> SnarsBelief:
+        """Believe `statement` at `evidence` from `source`. Believing the identical event again records nothing new,
+        as ingest_text and register_goal do, since SNARS's receipt for the source and statement already holds it."""
+
         atom = self.builder.codec.statement(statement)
         counts = evidence or EvidenceCounts(1.0, 0.0, 0.5)
         payload = {
@@ -284,7 +302,9 @@ class SnarsSession:
             "occurrence": occurrence,
         }
         prepared = self.store.prepare_payload("belief", payload)
-        _event_fragments("belief", prepared, self.builder)
+        duplicate = self._has_event("belief", prepared)
+        if not duplicate:
+            _event_fragments("belief", prepared, self.builder)
         operation = self._gc(
             "belief-record",
             self.builder.codec.symbol("belief"),
@@ -294,10 +314,11 @@ class SnarsSession:
         envelope = self._execute(
             operation,
             expected_operation="belief",
-            pending=("belief", prepared),
+            pending=None if duplicate else ("belief", prepared),
         )
         belief = parse_belief(envelope.payload, self.builder.codec)
-        self.store.append_prepared("belief", prepared)
+        if not duplicate:
+            self.store.append_prepared("belief", prepared)
         return belief
 
     def belief(
@@ -752,6 +773,7 @@ class SnarsSession:
                 else include_policy
             ),
             include_guard=include_guard,
+            assert_request_context=self.assert_request_context,
         )
         result = self.runtime.run_batch(program)
         return parse_protocol_output(

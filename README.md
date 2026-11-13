@@ -125,6 +125,35 @@ Offline output contains `"mode": "offline"` and
 `"native_snars_ran": false`. Native failures do not switch to offline mode.
 They return a structured error and a nonzero exit status.
 
+### Read the request's elements by meaning
+
+The policy decides on four elements of a request: sensitive data, public data,
+unverified facts and a need to coordinate. By default it believes an element
+when a parsed label is on its word list, at 8 units of evidence. With
+`GOALCHAINER_ELEMENTS=judged`, native mode instead asks the semantic rewriter's
+judge whether the request entails each element's statements, written from the
+same word lists, such as `The data includes customer emails.` or
+`They do not know yet.`. Each element is believed at the evidence of its best
+statement's opinion, from the source `semrewrite:nli-deberta-large`, so a
+paraphrase, a negation or a hedge reads as what it says and the decision carries
+how sure the judge is. The response's `elements` field names the statement each
+element matched and its opinion.
+
+```bash
+export GOALCHAINER_ELEMENTS=judged
+export GOALCHAINER_SEMREWRITE="/path/to/semrewrite/.venv/bin/python -m semrewrite.cli"
+PYTHONPATH=src python3 -m goal_chainer.cli demo --json \
+  --request "The dump we want to share reveals who our shoppers are."
+```
+
+Without `GOALCHAINER_SEMREWRITE`, GoalChainer runs `semrewrite` from `PATH`. A
+judge that cannot start, fails, times out or answers out of contract is a
+structured error, never a fall back to the word lists. Judged elements are
+native only, and a persistent store holds one request in this mode, since SNARS
+keeps one reading per source and statement. `benchmarks/judged_elements.py`
+fits the judge's trust and base rates on `tests/fixtures/judged_requests.json`
+and reports them on the held-out `tests/fixtures/judged_requests_heldout.json`.
+
 ## SNARS commands
 
 `goalchainer snars` is the decision summary. The same command has focused

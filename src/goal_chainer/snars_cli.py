@@ -1,4 +1,4 @@
-"""Structured command-line surface for native SNARS sessions."""
+"""Purpose: the structured command-line surface for native SNARS sessions."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ from dataclasses import asdict, is_dataclass
 from pathlib import Path
 from typing import Any
 
+from .judged_elements import elements_payload, read_request_elements, selected_reading
 from .snars_decision import native_decision_payload
 from .snars_models import EvidenceCounts, SnarsInvalidInputError
 from .snars_reasoner import SnarsOperation, SnarsSession
@@ -125,24 +126,38 @@ def run_snars_command(args: argparse.Namespace) -> dict[str, Any]:
         )
 
     request = args.request or ""
+    # am[implements a-goalchainer-judged-elements.judged-path]
+    reading = selected_reading()
     runtime = SnarsRuntime(require_text_ingestion=bool(request))
     session = (
-        SnarsSession.ephemeral(runtime)
+        SnarsSession.ephemeral(runtime, assert_request_context=reading != "judged")
         if args.database is None
-        else SnarsSession.persistent(runtime, args.database)
+        else SnarsSession.persistent(
+            runtime,
+            args.database,
+            assert_request_context=reading != "judged",
+        )
     )
     with session:
+        opinions = None
         if request:
             session.ingest_text(
                 request,
                 source=args.source,
                 trust=args.trust,
             )
+            opinions = read_request_elements(
+                session,
+                request,
+                reading,
+                timeout=runtime.timeout_seconds,
+            )
         result = _dispatch(args, session)
         return {
             "operation": args.operation,
             "mode": "native",
             "native_snars_ran": True,
+            "elements": elements_payload(reading, opinions),
             "state": session.state_payload(),
             "runtime": {
                 "mettabase_commit": runtime.diagnostics.mettabase_commit,

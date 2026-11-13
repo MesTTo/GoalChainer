@@ -1,4 +1,4 @@
-"""Shared decide-and-execute pipeline, used by the CLI and the skill bridge."""
+"""Purpose: the shared decide-and-execute pipeline, used by the CLI and the skill bridge."""
 
 from __future__ import annotations
 
@@ -8,12 +8,15 @@ from typing import Any
 
 from .execute import default_incident, execute_action
 from .hyperbase import build_hyperbase_packet
+from .judged_elements import READING_VARIABLE, selected_reading
 from .metta_reasoner import HyperBaseMettaReasoner
 from .ontology import load_colore_context
 from .scenarios import incident_response_scenario
 from .scoring import DecisionEngine
+from .snars_models import SnarsInvalidInputError
 
 
+# am[implements a-goalchainer-judged-elements.judged-path]
 def decide_incident(
     request: str,
     *,
@@ -22,7 +25,8 @@ def decide_incident(
     execute=None,
     orchestrate=None,
 ) -> dict[str, Any]:
-    """Run the native decision path or the explicitly labelled offline path."""
+    """Run the native decision path or the explicitly labelled offline path. Judged elements are read only natively,
+    so the offline path refuses them rather than deciding from its keywords under that name."""
 
     selected_mode = _decision_mode(mode)
     if selected_mode == "native":
@@ -33,6 +37,11 @@ def decide_incident(
             store_path=store_path,
             execute=execute,
             orchestrate=orchestrate,
+        )
+    if selected_reading() == "judged":
+        raise SnarsInvalidInputError(
+            "Judged elements are read only in native mode.",
+            details={"mode": selected_mode, "variable": READING_VARIABLE},
         )
     return _offline_decision(request)
 

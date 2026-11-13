@@ -198,15 +198,21 @@ class SnarsProgramBuilder:
         effects: Sequence[str] = (),
         include_policy: bool = False,
         include_guard: bool = False,
+        assert_request_context: bool = True,
     ) -> str:
+        """One program running `operation` after the facts and effects. With the policy included, the policy
+        initialises its actions and, unless `assert_request_context` is false, believes the request's elements from
+        its parsed labels; a caller that believes the elements itself, as judged elements do, turns that off."""
+
         for fact in facts:
             _validate_generated_fact(fact, self.codec)
         body_effects = list(effects)
         if include_policy:
+            # am[implements a-gcje-believe]
             body_effects.extend(
                 (
                     "(gc init-policy!)",
-                    "(gc assert-request-context!)",
+                    *(("(gc assert-request-context!)",) if assert_request_context else ()),
                     "(sn cycles 2)",
                 )
             )

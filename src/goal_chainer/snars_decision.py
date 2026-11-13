@@ -1,4 +1,5 @@
-"""Native SNARS decision orchestration for the incident scenario."""
+"""Purpose: native SNARS decision orchestration for the incident scenario, reading the request's elements by the
+policy's label lists or, with GOALCHAINER_ELEMENTS=judged, by the semantic rewriter's judge."""
 
 from __future__ import annotations
 
@@ -8,6 +9,12 @@ from typing import Any, Callable, TypedDict, Unpack
 
 from .deontic_engine import derive_deontic
 from .evidence import IncidentEvidence
+from .judged_elements import (
+    SOURCE as JUDGED_SOURCE,
+    elements_payload,
+    read_request_elements,
+    selected_reading,
+)
 from .motivation import available as metamo_available
 from .motivation import consensus_decision
 from .motivation import summary as motivation_summary
@@ -38,6 +45,7 @@ class NativeDecisionOptions(TypedDict, total=False):
     orchestrate: OrchestrateCallback | None
 
 
+# am[implements a-goalchainer-judged-elements.judged-path]
 def native_decision(
     request: str,
     *,
@@ -46,19 +54,34 @@ def native_decision(
     execute: ExecuteCallback | None = None,
     orchestrate: OrchestrateCallback | None = None,
 ) -> dict[str, Any]:
-    """Run parsed SH evidence through SNARS, lib_deontic, MetaMo, and scoring."""
+    """Run parsed SH evidence through SNARS, lib_deontic, MetaMo, and scoring.
 
+    GOALCHAINER_ELEMENTS selects how the request's elements are read: keywords, the default, lets the policy believe
+    them from parsed labels; judged believes the semantic rewriter's judge's opinions instead (judged_elements)."""
+
+    reading = selected_reading()
+    judged = reading == "judged"
     native_runtime = runtime or SnarsRuntime(require_text_ingestion=True)
     session = (
-        SnarsSession.ephemeral(native_runtime)
+        SnarsSession.ephemeral(native_runtime, assert_request_context=not judged)
         if store_path is None
-        else SnarsSession.persistent(native_runtime, store_path)
+        else SnarsSession.persistent(
+            native_runtime,
+            store_path,
+            assert_request_context=not judged,
+        )
     )
     with session:
         session.ingest_text(request, source=REQUEST_SOURCE)
         ingestion = session.last_ingestion_payload
+        opinions = read_request_elements(
+            session,
+            request,
+            reading,
+            timeout=native_runtime.timeout_seconds,
+        )
         context = session.request_context()
-        evidence = _incident_evidence(request, context)
+        evidence = _incident_evidence(request, context, judged=judged)
         scenario = incident_scenario(evidence)
 
         registered_goals = []
@@ -148,6 +171,7 @@ def native_decision(
             "runtime": _runtime_payload(native_runtime),
             "scenario": scenario,
             "evidence": evidence,
+            "elements": elements_payload(reading, opinions),
             "request_context": context,
             "ingestion": ingestion,
             "registered_goals": registered_goals,
@@ -186,6 +210,7 @@ def native_decision_payload(
             "notes": list(scenario.notes),
         },
         "evidence": evidence.to_dict(),
+        "elements": result["elements"],
         "ingestion": result["ingestion"],
         "request_context": _context_payload(result["request_context"]),
         "goals": [asdict(goal) for goal in result["registered_goals"]],
@@ -215,17 +240,26 @@ def native_decision_payload(
     }
 
 
+# am[implements a-goalchainer-judged-elements.judged-path]
 def _incident_evidence(
     request: str,
     context: SnarsRequestContext,
+    *,
+    judged: bool,
 ) -> IncidentEvidence:
+    """The decision's evidence from SNARS's beliefs about the request's elements, each held when supported."""
+
     sensitive = _supported(context.sensitive)
     public = _supported(context.public)
     unverified = _supported(context.unverified)
     coordination = _supported(context.coordination)
     return IncidentEvidence(
         request=request,
-        sensitive_categories=("parsed sensitive data",) if sensitive else (),
+        sensitive_categories=(
+            ("judged sensitive data" if judged else "parsed sensitive data",)
+            if sensitive
+            else ()
+        ),
         public_declared=public,
         facts_ready=not unverified,
         coordination_needed=coordination,
@@ -239,14 +273,18 @@ def _incident_evidence(
             )
             if _supported(belief)
         ),
-        provenance="mettabase-snars",
+        provenance=f"{JUDGED_SOURCE}+mettabase-snars" if judged else "mettabase-snars",
         concept_scores={
             "sensitive": context.sensitive.opinion.expectation,
             "public": context.public.opinion.expectation,
             "unverified": context.unverified.opinion.expectation,
             "coordination": context.coordination.opinion.expectation,
         },
-        risk_grounding="Mettabase SH labels and native SNARS receipts",
+        risk_grounding=(
+            "the semantic rewriter's judge's opinions and native SNARS receipts"
+            if judged
+            else "Mettabase SH labels and native SNARS receipts"
+        ),
     )
 
 
