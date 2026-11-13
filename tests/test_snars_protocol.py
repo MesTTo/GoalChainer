@@ -233,3 +233,51 @@ def test_counterfactual_parser_rejects_state_leak(codec) -> None:
 
     with pytest.raises(SnarsProtocolError, match="roll back"):
         parse_counterfactual(payload, codec)
+
+
+def _belief_with(opinion: str, evidence: str) -> str:
+    return f"""
+        (goalchainer-snars-v1 belief ok
+          (belief sid-1
+            (sh (tag P d so ()) "is" (args ((arg s (sn c "a")) (arg o (sn c "b")))))
+            {opinion}
+            {evidence}
+            (receipts ((receipt receipt-1 "source one" sid-1 1.0)))
+            (proofs ())
+            (occurrences ())))
+        """
+
+
+# am[verifies i-gcje-snars-float-noise]
+def test_belief_parser_reads_snars_rounding_at_a_bound_as_the_bound(codec) -> None:
+    # The assessment SNARS returned for "Do not publish the raw logs that expose customer emails." with sensitive
+    # data believed at evidence (8, 0) and base rate 11/26.
+    envelope = parse_protocol_output(
+        [_belief_with("(opinion 0.6673170731707319 -1.3877787807814457e-17 0.33268292682926837 0.5)",
+                      "(evidence 4.011730205278593 -3.5e-16 1.0000000000000002)")],
+        codec,
+        expected_operation="belief",
+    )
+
+    belief = parse_belief(envelope.payload, codec)
+
+    assert belief.opinion.disbelief == 0.0
+    assert belief.opinion.belief == pytest.approx(0.6673170731707319)
+    assert belief.evidence.negative == 0.0
+    assert belief.evidence.base_rate == 1.0
+
+
+# am[verifies i-gcje-snars-float-noise]
+@pytest.mark.parametrize(
+    ("opinion", "evidence"),
+    [
+        ("(opinion 0.6 -0.1 0.5 0.5)", "(evidence 6 1 0.5)"),
+        ("(opinion 0.6 0.1 0.2 0.5)", "(evidence 6 1 0.5)"),
+        ("(opinion 0.6 0.1 0.3 0.5)", "(evidence 6 -1 0.5)"),
+    ],
+)
+def test_belief_parser_refuses_an_invalid_opinion_as_a_protocol_error(codec, opinion, evidence) -> None:
+    envelope = parse_protocol_output([_belief_with(opinion, evidence)], codec, expected_operation="belief")
+
+    with pytest.raises(SnarsProtocolError, match="not a valid opinion|not valid evidence"):
+        parse_belief(envelope.payload, codec)

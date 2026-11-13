@@ -1,4 +1,4 @@
-"""Parse GoalChainer's versioned SNARS S-expression protocol."""
+"""Purpose: parse GoalChainer's versioned SNARS S-expression protocol."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ import re
 from typing import Any, Iterable
 
 from .snars_models import (
+    OPINION_SUM_TOLERANCE,
     EvidenceCounts,
     EvidenceReceipt,
     SnarsActionAssessment,
@@ -179,18 +180,52 @@ def state_digest(atom: Any, codec: SexprCodec) -> str:
     return hashlib.sha256(codec.emit(atom).encode("utf-8")).hexdigest()
 
 
+# am[addresses i-gcje-snars-float-noise]
 def _parse_opinion(atom: Any, codec: SexprCodec) -> SubjectiveOpinion:
+    """An opinion record as the model. SNARS's float arithmetic leaves a component that should be 0 or 1 off by
+    rounding, such as a disbelief of -1.4e-17 derived from a base rate of 11/26, so a component within the model's
+    tolerance of a bound is read as the bound; anything further out is a protocol error."""
+
     row = _expect_tag(atom, "opinion", codec, aliases=("Opinion",))
     if len(row) != 5:
         raise SnarsProtocolError("Opinion record has the wrong arity.")
-    return SubjectiveOpinion(*(_float(item, codec) for item in row[1:]))
+    values = [_snapped(_float(item, codec), upper=1.0) for item in row[1:]]
+    try:
+        return SubjectiveOpinion(*values)
+    except ValueError as exc:
+        raise SnarsProtocolError(
+            "Opinion record is not a valid opinion.",
+            details={"opinion": values, "error": str(exc)},
+        ) from exc
 
 
+# am[addresses i-gcje-snars-float-noise]
 def _parse_evidence(atom: Any, codec: SexprCodec) -> EvidenceCounts:
+    """An evidence record as the model, a count within the tolerance below 0 read as 0, as for opinions."""
+
     row = _expect_tag(atom, "evidence", codec, aliases=("Ev",))
     if len(row) != 4:
         raise SnarsProtocolError("Evidence record has the wrong arity.")
-    return EvidenceCounts(*(_float(item, codec) for item in row[1:]))
+    positive, negative, base_rate = (_float(item, codec) for item in row[1:])
+    values = [_snapped(positive), _snapped(negative), _snapped(base_rate, upper=1.0)]
+    try:
+        return EvidenceCounts(*values)
+    except ValueError as exc:
+        raise SnarsProtocolError(
+            "Evidence record is not valid evidence.",
+            details={"evidence": values, "error": str(exc)},
+        ) from exc
+
+
+# am[addresses i-gcje-snars-float-noise]
+def _snapped(value: float, *, upper: float | None = None) -> float:
+    """`value` with rounding within OPINION_SUM_TOLERANCE outside [0, upper] moved onto the bound it missed."""
+
+    if -OPINION_SUM_TOLERANCE <= value < 0.0:
+        return 0.0
+    if upper is not None and upper < value <= upper + OPINION_SUM_TOLERANCE:
+        return upper
+    return value
 
 
 def _parse_receipt(
