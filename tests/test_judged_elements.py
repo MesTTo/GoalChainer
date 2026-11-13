@@ -18,6 +18,7 @@ import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 
+from goal_chainer import cli
 from goal_chainer import judged_elements as je
 from goal_chainer.judged_elements import (
     BASE_RATES,
@@ -362,6 +363,21 @@ def test_native_decision_reads_the_judge_and_not_the_keywords(monkeypatch) -> No
     raw = next(row for row in payload["decisions"] if row["action_id"] == "publish_raw_log")
     assert raw["status"] == "blocked"
     assert raw["norm_status"] == "forbidden"
+
+
+# am[verifies a-goalchainer-judged-elements.judged-path]
+def test_snars_command_reads_the_judge_and_not_the_keywords(monkeypatch, capsys) -> None:
+    monkeypatch.setenv("GOALCHAINER_ELEMENTS", "judged")
+    _fake_judge(monkeypatch, {EMAILS: (0.95, 0.0)})
+
+    exit_code = cli.main(["snars", "assess", "--request", REQUEST, "--json"])
+    payload = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 0
+    assert payload["elements"]["reading"] == "judged"
+    context = payload["result"]["context"]
+    assert context["sensitive"]["sources"] == [SOURCE]
+    assert context["public"]["sources"] == [] and context["coordination"]["sources"] == []
 
 
 # am[verifies a-gcje-believe]
